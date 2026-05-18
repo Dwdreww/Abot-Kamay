@@ -79,7 +79,11 @@ export default function Profile() {
             name: data.formTitle || 'Application',
             date: submittedAt ? submittedAt.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'Kamakailan',
             status: data.status || 'pending',
-            color: data.status === 'approved' ? 'emerald' : data.status === 'for_review' ? 'blue' : 'slate',
+            color: (data.status === 'approved' || data.status === 'completed') ? 'emerald' :
+                   (data.status === 'pending' || data.status === 'draft') ? 'blue' :
+                   data.status === 'for_review' ? 'yellow' :
+                   data.status === 'returned' ? 'purple' :
+                   data.status === 'rejected' ? 'red' : 'slate',
             type: data.formType || 'application',
             collectionName: 'applications',
             rawDate: submittedAt || new Date(0)
@@ -510,11 +514,20 @@ function DocumentRow({
       <td className="px-8 py-5">
         <span className={cn(
           "px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest",
-          color === 'emerald' ? "bg-emerald-100 text-emerald-600" :
-          color === 'blue' ? "bg-blue-100 text-blue-600" :
-          "bg-slate-100 text-slate-600"
+          color === 'emerald' ? "bg-emerald-50 text-emerald-600" :
+          color === 'blue'    ? "bg-blue-50 text-blue-600" :
+          color === 'yellow'  ? "bg-yellow-50 text-yellow-600" :
+          color === 'purple'  ? "bg-purple-50 text-purple-600" :
+          color === 'red'     ? "bg-red-50 text-red-600" :
+                                "bg-slate-100 text-slate-500"
         )}>
-          {status === 'Approved' ? 'Aprubado' : status === 'In Review' ? 'Sinusuri' : status === 'Submitted' ? 'Isinumite' : status}
+          {status === 'approved'  ? 'Inaprubahan' :
+           status === 'completed' ? 'Nakumpleto' :
+           status === 'pending'   ? 'Nakabinbin' :
+           status === 'draft'     ? 'Draft' :
+           status === 'for_review'? 'Sinusuri' :
+           status === 'returned'  ? 'Ibinabalik' :
+           status === 'rejected'  ? 'Tinanggihan' : status}
         </span>
       </td>
       <td className="px-8 py-5">

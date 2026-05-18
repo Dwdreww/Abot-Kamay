@@ -319,22 +319,6 @@ export default function PWDProfiles() {
         profile={selectedProfile}
       />
 
-      {/* Info Notice */}
-      <div className="p-12 bg-[#0b1a38] rounded-[60px] relative overflow-hidden group shadow-2xl">
-         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
-            <div className="space-y-4 max-w-2xl text-center md:text-left">
-               <h3 className="text-2xl font-black text-white tracking-tight uppercase leading-none">Confidentiality & Data Privacy</h3>
-               <p className="text-slate-400 font-medium leading-relaxed">
-                 Member records contain sensitive personal information. All actions taken within the PWD Directory are recorded for auditing purposes. Ensure that you follow data privacy protocols when handling member information.
-               </p>
-            </div>
-            <button className="px-10 py-5 bg-white/10 border border-white/20 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-white transition-all hover:text-[#0b1a38] shadow-2xl">
-               Learn Data Protocols
-            </button>
-         </div>
-         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/20 blur-[150px] rounded-full -translate-y-1/2 translate-x-1/2"></div>
-         <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/10 blur-[150px] rounded-full translate-y-1/2 -translate-x-1/2"></div>
-      </div>
     </div>
   );
 }

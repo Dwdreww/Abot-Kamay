@@ -117,16 +117,14 @@ export default function AuthPage({ onBack }: { onBack: () => void }) {
   };
 
   const handleRoleSelect = (role: UserRole) => {
-    if (mode === 'register' && role !== 'member') {
-      setError('Admin at staff accounts ay dapat gawin lamang ng system administrator.');
-      return;
-    }
-
     setError(null);
-    setFormData((prev) => ({
-      ...prev,
-      role,
-    }));
+    // If currently in register mode and switching to a non-member role,
+    // quietly drop back to login — registration is only for members.
+    if (mode === 'register' && role !== 'member') {
+      setMode('login');
+      setStep(1);
+    }
+    setFormData((prev) => ({ ...prev, role }));
   };
 
   const handleLogin = async () => {
@@ -247,84 +245,98 @@ export default function AuthPage({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="min-h-screen flex font-sans bg-white">
-      <div className="hidden lg:flex w-[45%] bg-blue-900 text-white p-16 flex-col justify-between relative overflow-hidden shrink-0">
-        <div className="absolute inset-0 pointer-events-none z-0">
-          <div className="absolute top-[-10%] right-[-10%] w-[80%] h-[80%] bg-blue-800/30 blur-[120px] rounded-full"></div>
-          <div className="absolute bottom-[20%] left-[-10%] w-[50%] h-[50%] bg-blue-950/40 blur-[100px] rounded-full rotate-12"></div>
-          <div className="absolute top-[20%] right-[10%] w-32 h-32 border-4 border-white/5 rotate-45 rounded-lg"></div>
-          <div className="absolute bottom-[30%] left-[15%] w-24 h-24 bg-blue-700/10 blur-xl rounded-full"></div>
-
-          <div className="absolute top-1/2 right-12 grid grid-cols-4 gap-2 opacity-10">
-            {[...Array(16)].map((_, i) => (
-              <div key={i} className="w-1.5 h-1.5 bg-white rounded-full"></div>
-            ))}
-          </div>
+      <div className="hidden lg:flex w-[45%] text-white flex-col relative overflow-hidden shrink-0">
+        {/* Full-bleed background photo + dark navy overlay */}
+        <div className="absolute inset-0">
+          <img
+            src="/random_portal.png"
+            alt=""
+            className="w-full h-full object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#06112a]/95 via-[#0a1c40]/90 to-[#061228]/95"></div>
         </div>
 
-        <div className="relative z-10 flex flex-col h-full">
+        {/* Decorative elements */}
+        {/* Large faint circles top-left */}
+        <div className="absolute -top-24 -left-24 w-[420px] h-[420px] border border-white/8 rounded-full pointer-events-none"></div>
+        <div className="absolute -top-12 -left-12 w-[280px] h-[280px] border border-white/10 rounded-full pointer-events-none"></div>
+        {/* Diamond shape right side */}
+        <div className="absolute top-[18%] right-[8%] w-14 h-14 bg-blue-500/25 rotate-45 rounded-md pointer-events-none"></div>
+        <div className="absolute top-[14%] right-[22%] w-4 h-4 bg-blue-400/30 rotate-45 pointer-events-none"></div>
+        {/* Dot grid */}
+        <div className="absolute top-[30%] right-10 grid grid-cols-5 gap-[7px] opacity-15 pointer-events-none">
+          {[...Array(25)].map((_, i) => (
+            <div key={i} className="w-1 h-1 bg-white rounded-full"></div>
+          ))}
+        </div>
+        {/* Bottom glow */}
+        <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-[#06112a]/80 to-transparent pointer-events-none"></div>
+
+        {/* Content */}
+        <div className="relative z-10 flex flex-col h-full p-14">
+          {/* Back button */}
           <button
             onClick={onBack}
-            className="flex items-center gap-2 mb-16 text-white/80 hover:text-white transition-colors text-sm font-bold w-fit group"
+            className="flex items-center gap-2 mb-10 text-white/70 hover:text-white transition-colors text-sm font-bold w-fit group"
           >
-            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             Bumalik sa Home Page
           </button>
 
-          <div className="mb-20 space-y-10">
+          {/* Logo row */}
+          <div className="flex items-center gap-4">
             <img
               src="/logoAbotKamay.png"
               alt="Abot-Kamay Logo"
-              className="h-16 w-auto mb-8 rounded-2xl"
+              className="h-12 w-12 rounded-xl object-contain"
             />
-
-            <div className="space-y-6">
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-6xl font-black leading-[1.05] tracking-tight"
-              >
-                Suportang <br />Abot-Kamay, <br />
-                <span className="text-blue-200">Para Sayo.</span>
-              </motion.h1>
-
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="text-lg font-medium opacity-80 max-w-sm"
-              >
-                Nagpapalakas sa mga Taong may Kapansanan at sabay na bumubuo ng isang komunidad na walang iniiwan.
-              </motion.p>
-            </div>
-
-            <div className="flex items-start gap-4 pt-4">
-              <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/50">
-                <MapPin className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <p className="text-sm font-black uppercase tracking-widest text-white">
-                  Brgy. San Antonio de Padua I,
-                </p>
-                <p className="text-sm font-medium opacity-70">Dasmariñas, Cavite</p>
-              </div>
+            <div>
+              <p className="text-lg font-black tracking-tight leading-none">Abot-Kamay</p>
+              <p className="text-[9px] font-bold text-blue-300 uppercase tracking-[0.18em] mt-0.5">
+                Empowering Lives. Building Inclusion.
+              </p>
             </div>
           </div>
 
-          <div className="mt-auto relative">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.3 }}
-              className="rounded-[3rem] overflow-hidden border-8 border-white/10 shadow-2xl"
+          {/* Main headline + body */}
+          <div className="mt-auto mb-auto flex flex-col justify-center pt-16">
+            <motion.h1
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="text-[3.4rem] font-black leading-[1.08] tracking-tight"
             >
-              <img
-                src="/random_portal.png"
-                alt="Assistance"
-                className="w-full h-[320px] object-cover"
-              />
-            </motion.div>
-            <div className="absolute -bottom-8 -right-8 w-16 h-16 bg-blue-500 rounded-full blur-2xl opacity-40"></div>
+              Accessible Support,<br />
+              <span className="text-blue-300">Within Reach.</span>
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15, duration: 0.5 }}
+              className="mt-6 text-base font-medium text-white/75 max-w-[340px] leading-relaxed"
+            >
+              Empowering Persons with Disabilities and building an inclusive community together.
+            </motion.p>
           </div>
+
+          {/* Location */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25, duration: 0.5 }}
+            className="flex items-start gap-3 mt-auto"
+          >
+            <div className="w-9 h-9 bg-blue-600/70 rounded-xl flex items-center justify-center shrink-0 mt-0.5 border border-blue-500/40">
+              <MapPin className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <p className="text-sm font-black text-white leading-snug">
+                Brgy. San Antonio de Padua I,
+              </p>
+              <p className="text-sm font-medium text-white/60">Dasmariñas, Cavite</p>
+            </div>
+          </motion.div>
         </div>
       </div>
 
@@ -745,18 +757,21 @@ export default function AuthPage({ onBack }: { onBack: () => void }) {
                 </button>
               )}
 
-              <button
-                type="button"
-                onClick={handleModeToggle}
-                className="w-full bg-white text-blue-600 border-2 border-blue-600/30 font-black py-5 rounded-2xl hover:bg-blue-50 transition-all active:scale-[0.98] flex items-center justify-center gap-3 text-sm uppercase tracking-[0.1em]"
-              >
-                {mode === 'login' ? (
-                  <UserPlus className="w-5 h-5" />
-                ) : (
-                  <Users className="w-5 h-5" />
-                )}
-                {mode === 'login' ? 'Gumawa ng Account' : 'Bumalik sa Login'}
-              </button>
+              {/* Only PWD members can self-register; hide for admin/staff */}
+              {(formData.role === 'member' || mode === 'register') && (
+                <button
+                  type="button"
+                  onClick={handleModeToggle}
+                  className="w-full bg-white text-blue-600 border-2 border-blue-600/30 font-black py-5 rounded-2xl hover:bg-blue-50 transition-all active:scale-[0.98] flex items-center justify-center gap-3 text-sm uppercase tracking-[0.1em]"
+                >
+                  {mode === 'login' ? (
+                    <UserPlus className="w-5 h-5" />
+                  ) : (
+                    <Users className="w-5 h-5" />
+                  )}
+                  {mode === 'login' ? 'Gumawa ng Account' : 'Bumalik sa Login'}
+                </button>
+              )}
 
               {mode === 'register' && step === 2 && (
                 <button

@@ -166,25 +166,37 @@ export default function BurialForm() {
   const handleDownload = async () => {
     const element = document.getElementById('form-p-preview');
     if (!element) return;
-    
     setLoading(true);
     try {
-      // Give DOM time to ensure fonts/images are ready
       await new Promise(resolve => setTimeout(resolve, 100));
-      
-      const canvas = await html2canvas(element, { 
-        scale: 1.5,
-        useCORS: true,
-        logging: false
-      });
-      const imgData = canvas.toDataURL('image/jpeg', 0.85);
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      
-      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`Burial_Assistance_${refNo}.pdf`);
+      const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
+      const pageW = 215.9;
+      const pageH = 279.4;
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [pageW, pageH] });
+      const imgW = pageW;
+      const pageHeightPx = Math.floor((canvas.width * pageH) / pageW);
+      let offset = 0;
+      let firstPage = true;
+      while (offset < canvas.height) {
+        if (!firstPage) pdf.addPage();
+        firstPage = false;
+        const slice = document.createElement('canvas');
+        slice.width = canvas.width;
+        slice.height = Math.min(pageHeightPx, canvas.height - offset);
+        slice.getContext('2d')!.drawImage(canvas, 0, -offset);
+        const sliceH = (slice.height * imgW) / canvas.width;
+        pdf.addImage(slice.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, imgW, sliceH);
+        offset += pageHeightPx;
+      }
+      const blob = pdf.output('blob');
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Burial_Assistance_${refNo}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
     } catch (err) {
       console.error('Failed to generate PDF', err);
     } finally {

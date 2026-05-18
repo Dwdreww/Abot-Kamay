@@ -12,7 +12,7 @@ export default function DOHForm() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [refNo] = useState(generateRef());
+  const [refNo, setRefNo] = useState(generateRef());
   const [activeTab, setActiveTab] = useState<'personal' | 'disability' | 'employment' | 'additional'>('personal');
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
@@ -72,7 +72,8 @@ export default function DOHForm() {
     try {
       const newDocRef = doc(collection(db, 'applications'));
       const actualRefNo = await generateApplicationReference();
-      
+      setRefNo(actualRefNo);
+
       const payload = {
         applicationId: newDocRef.id,
         referenceNumber: actualRefNo,

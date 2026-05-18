@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   FileText, Search, Megaphone, User,
-  LogOut, Menu, Bell, ChevronDown, Phone,
+  LogOut, Menu, Bell, ChevronDown,
   Settings, Info, Users
 } from 'lucide-react';
 import { auth, db } from '../lib/firebase';
@@ -24,14 +24,18 @@ import UserManagement from './dashboard/UserManagement';
 import AuditLogs from './dashboard/AuditLogs';
 import SettingsView from './dashboard/Settings';
 import Profile from './dashboard/Profile';
-import HelpSupport from './dashboard/HelpSupport';
-
-type ViewType = 'overview' | 'pwd' | 'forms' | 'tracking' | 'verification' | 'review' | 'reports' | 'announcements' | 'users' | 'audit' | 'settings' | 'profile' | 'help';
+type ViewType = 'overview' | 'pwd' | 'forms' | 'tracking' | 'verification' | 'review' | 'reports' | 'announcements' | 'users' | 'audit' | 'settings' | 'profile';
 
 export default function Dashboard() {
   const { user, signOut } = useAuth();
   const [activeView, setActiveView] = useState<ViewType>('overview');
+  const [trackingFilter, setTrackingFilter] = useState<string | undefined>(undefined);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  const navigateTo = (view: ViewType, filter?: string) => {
+    setTrackingFilter(view === 'tracking' ? filter : undefined);
+    setActiveView(view);
+  };
   const [notifications, setNotifications] = useState<SystemNotification[]>([]);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -100,9 +104,8 @@ export default function Dashboard() {
   const systemTools = {
     label: 'Sistema',
     items: [
-      { id: 'settings', label: 'Settings', icon: Settings, roles: ['admin', 'staff'] },
+      { id: 'settings', label: 'Edit Profile', icon: Settings, roles: ['admin', 'staff'] },
       { id: 'users', label: 'User Management', icon: Users, roles: ['admin'] },
-      { id: 'help', label: 'Tulong at Suporta', icon: Phone, roles: ['admin', 'staff', 'member'] },
     ]
   };
 
@@ -160,7 +163,7 @@ export default function Dashboard() {
                 return (
                   <button
                     key={item.id}
-                    onClick={() => setActiveView(item.id as ViewType)}
+                    onClick={() => navigateTo(item.id as ViewType)}
                     className={cn(
                       "w-full flex items-center gap-4 px-4 py-3.5 transition-all rounded-xl relative group font-bold",
                       isActive
@@ -191,7 +194,7 @@ export default function Dashboard() {
                 return (
                   <button
                     key={item.id}
-                    onClick={() => setActiveView(item.id as ViewType)}
+                    onClick={() => navigateTo(item.id as ViewType)}
                     className={cn(
                       "w-full flex items-center gap-4 px-4 py-3.5 transition-all rounded-xl relative group font-bold",
                       isActive
@@ -222,7 +225,7 @@ export default function Dashboard() {
                 return (
                   <button
                     key={item.id}
-                    onClick={() => setActiveView(item.id as ViewType)}
+                    onClick={() => navigateTo(item.id as ViewType)}
                     className={cn(
                       "w-full flex items-center gap-4 px-4 py-3.5 transition-all rounded-xl relative group font-bold",
                       isActive
@@ -241,31 +244,6 @@ export default function Dashboard() {
 
         {/* Footer Sidebar */}
         <div className="p-6 space-y-6">
-          {isSidebarOpen && (
-            <div className={cn(
-              "p-5 rounded-2xl border space-y-4 shadow-xl",
-              user?.role === 'member'
-                ? "bg-white/10 border-white/10"
-                : "bg-blue-600/20 border-white/5"
-            )}>
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center shrink-0">
-                  <Phone className="w-4 h-4 text-white" />
-                </div>
-                <div>
-                  <p className="text-[10px] font-black text-white uppercase tracking-widest">Kailangan ng Tulong?</p>
-                  <p className="text-[9px] text-white/60 mt-1 leading-tight">Pumunta sa aming Help Center para sa gabay.</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setActiveView('help')}
-                className="w-full py-2 bg-white/10 hover:bg-white/20 rounded-lg text-[10px] font-black text-white uppercase tracking-widest transition-all"
-              >
-                Pumunta sa Help Center
-              </button>
-            </div>
-          )}
-
           <button
             onClick={handleSignOut}
             className={cn(
@@ -319,7 +297,7 @@ export default function Dashboard() {
                     notifications.map(n => (
                       <button 
                         key={n.id}
-                        onClick={() => { if(!n.isRead) handleReadNotif(n.id!); setIsNotifOpen(false); }}
+                        onClick={() => { if(!n.isRead) handleReadNotif(n.id!); setIsNotifOpen(false); if(user?.role === 'member') navigateTo('tracking'); }}
                         className={cn("w-full text-left p-4 border-b border-slate-50 hover:bg-slate-50 transition-colors", !n.isRead && "bg-blue-50/30")}
                       >
                         <p className={cn("text-xs font-bold uppercase tracking-wider mb-1", n.type === 'success' ? 'text-emerald-600' : n.type === 'error' ? 'text-red-600' : n.type === 'warning' ? 'text-amber-600' : 'text-blue-600')}>{n.title}</p>
@@ -393,10 +371,10 @@ export default function Dashboard() {
                 transition={{ duration: 0.3 }}
                 className="h-full"
               >
-                {activeView === 'overview' && <Overview />}
+                {activeView === 'overview' && <Overview onNavigate={navigateTo} />}
                 {activeView === 'pwd' && <PWDProfiles />}
                 {activeView === 'forms' && <DigitalForms />}
-                {activeView === 'tracking' && <ApplicationTracking />}
+                {activeView === 'tracking' && <ApplicationTracking initialFilter={trackingFilter} />}
                 {activeView === 'verification' && <RequirementsVerification />}
                 {activeView === 'review' && <ApplicationReview />}
                 {activeView === 'reports' && <Reports />}
@@ -405,7 +383,6 @@ export default function Dashboard() {
                 {activeView === 'audit' && <AuditLogs />}
                 {activeView === 'settings' && <SettingsView />}
                 {activeView === 'profile' && <Profile />}
-                {activeView === 'help' && <HelpSupport />}
               </motion.div>
             </AnimatePresence>
           </div>

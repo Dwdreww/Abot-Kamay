@@ -1,17 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Download, Printer, Send, Eye, FileText, ChevronLeft, MapPin, Calendar, User, Loader2, CheckCircle } from 'lucide-react';
 import { generateRef, cn } from '../../../lib/utils';
 import { generateApplicationReference } from '../../../lib/applicationService';
 import { useAuth } from '../../../App';
 import { db } from '../../../lib/firebase';
 import { collection, addDoc, doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 
 export default function BrgyCertForm() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [refNo, setRefNo] = useState(generateRef());
   const [showPreview, setShowPreview] = useState(false);
+  const previewRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     deceasedName: '',
@@ -75,6 +79,47 @@ export default function BrgyCertForm() {
       alert(`Failed to submit application: ${err instanceof Error ? err.message : 'Please try again.'}`);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDownload = async () => {
+    const el = previewRef.current;
+    if (!el) return;
+    setDownloading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
+      const pageW = 215.9;
+      const pageH = 279.4;
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [pageW, pageH] });
+      const imgW = pageW;
+      const pageHeightPx = Math.floor((canvas.width * pageH) / pageW);
+      let offset = 0;
+      let firstPage = true;
+      while (offset < canvas.height) {
+        if (!firstPage) pdf.addPage();
+        firstPage = false;
+        const slice = document.createElement('canvas');
+        slice.width = canvas.width;
+        slice.height = Math.min(pageHeightPx, canvas.height - offset);
+        slice.getContext('2d')!.drawImage(canvas, 0, -offset);
+        const sliceH = (slice.height * imgW) / canvas.width;
+        pdf.addImage(slice.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, imgW, sliceH);
+        offset += pageHeightPx;
+      }
+      const blob = pdf.output('blob');
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Barangay_Certification_${refNo}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (err) {
+      console.error('PDF generation failed', err);
+    } finally {
+      setDownloading(false);
     }
   };
 
@@ -209,15 +254,19 @@ export default function BrgyCertForm() {
                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                    I-submit ang Aplikasyon
                  </button>
-                 <button className="px-6 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition-all shadow-md shadow-green-600/20 flex items-center gap-2">
-                    <Download className="w-5 h-5" />
-                    I-export ang PDF
+                 <button
+                   onClick={handleDownload}
+                   disabled={downloading}
+                   className="px-6 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition-all shadow-md shadow-green-600/20 flex items-center gap-2 disabled:opacity-50"
+                 >
+                    {downloading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
+                    {downloading ? 'Generating...' : 'I-export ang PDF'}
                  </button>
               </div>
            </div>
 
            {/* Letter Preview */}
-           <div className="bg-white p-20 shadow-2xl rounded-sm border border-neutral-100 max-w-[800px] mx-auto min-h-[1000px] flex flex-col">
+           <div ref={previewRef} className="bg-white p-20 shadow-2xl rounded-sm border border-neutral-100 max-w-[800px] mx-auto min-h-[1000px] flex flex-col">
               {/* Header */}
               <div className="text-center border-b-2 border-double border-neutral-900 pb-8 mb-12">
                  <p className="text-sm font-bold uppercase tracking-widest text-neutral-800">Republika ng Pilipinas</p>

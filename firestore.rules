@@ -58,14 +58,13 @@ service cloud.firestore {
     // Applications (Unified)
     match /applications/{appId} {
       allow read: if isStaff() || (isSignedIn() && resource.data.userId == request.auth.uid);
-      // Simplified rules for debugging permission issues
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      
       allow update: if isStaff() || (
-        isSignedIn() && 
+        isSignedIn() &&
         resource.data.userId == request.auth.uid &&
         request.resource.data.userId == request.auth.uid
       );
+      allow delete: if isStaff() || (isSignedIn() && resource.data.userId == request.auth.uid);
     }
 
     // Counters for generating Application IDs

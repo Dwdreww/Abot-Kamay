@@ -55,7 +55,11 @@ export default function DigitalForms() {
             refNo: data.referenceNumber || 'N/A',
             date: submittedAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
             status: data.status || 'pending',
-            color: data.status === 'approved' ? 'emerald' : 'blue',
+            color: (data.status === 'approved' || data.status === 'completed') ? 'emerald' :
+                   (data.status === 'pending' || data.status === 'draft') ? 'blue' :
+                   data.status === 'for_review' ? 'yellow' :
+                   data.status === 'returned' ? 'purple' :
+                   data.status === 'rejected' ? 'red' : 'slate',
             rawDate: submittedAt
           });
         });
@@ -245,10 +249,20 @@ export default function DigitalForms() {
                         <span className={cn(
                           "px-4 py-1.5 text-[9px] font-black rounded-full uppercase tracking-widest shadow-sm",
                           row.color === 'emerald' ? "bg-emerald-50 text-emerald-600" :
-                          row.color === 'blue' ? "bg-blue-50 text-blue-600 shadow-blue-100" :
+                          row.color === 'blue'    ? "bg-blue-50 text-blue-600 shadow-blue-100" :
+                          row.color === 'yellow'  ? "bg-yellow-50 text-yellow-600" :
+                          row.color === 'purple'  ? "bg-purple-50 text-purple-600" :
+                          row.color === 'red'     ? "bg-red-50 text-red-600" :
                           "bg-slate-100 text-slate-400"
                         )}>
-                          {row.status}
+                          {row.status === 'approved'   ? 'Inaprubahan'  :
+                           row.status === 'completed'  ? 'Nakumpleto'   :
+                           row.status === 'pending'    ? 'Nakabinbin'   :
+                           row.status === 'draft'      ? 'Draft'        :
+                           row.status === 'for_review' ? 'Sinusuri'     :
+                           row.status === 'returned'   ? 'Ibinabalik'   :
+                           row.status === 'rejected'   ? 'Tinanggihan'  :
+                           row.status}
                         </span>
                       </td>
                     </tr>

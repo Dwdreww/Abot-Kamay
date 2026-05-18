@@ -44,7 +44,7 @@ export default function RequirementsVerification() {
             type: data.formTitle || data.formType,
             date: data.submittedAt ? data.submittedAt.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A',
             status: data.status === 'pending' ? 'Pending' : data.status === 'for_review' ? 'Reviewing' : 'Returned',
-            color: data.status === 'returned' ? 'amber' : data.status === 'for_review' ? 'blue' : 'orange',
+            color: data.status === 'returned' ? 'purple' : data.status === 'for_review' ? 'blue' : 'orange',
             documents: data.requirements ? Object.keys(data.requirements).length : 3,
             verified: 0,
             rawData: data
@@ -186,6 +186,7 @@ export default function RequirementsVerification() {
                              selectedApp?.id === app.id 
                                 ? "bg-white/20 text-white" 
                                 : app.color === 'rose' ? "bg-rose-50 text-rose-600" :
+                                  app.color === 'purple' ? "bg-purple-50 text-purple-600" :
                                   app.color === 'orange' ? "bg-orange-50 text-orange-600" :
                                   "bg-amber-50 text-amber-600"
                           )}>
@@ -340,7 +341,7 @@ export default function RequirementsVerification() {
                              <button 
                                 disabled={actionLoading}
                                 onClick={() => handleUpdateStatus('returned', 'Returned')}
-                                className="flex items-center justify-center gap-3 py-5 bg-white border border-slate-200 text-slate-600 rounded-[25px] font-black text-xs uppercase tracking-widest hover:bg-orange-50 hover:text-orange-600 transition-all disabled:opacity-50"
+                                className="flex items-center justify-center gap-3 py-5 bg-white border border-slate-200 text-slate-600 rounded-[25px] font-black text-xs uppercase tracking-widest hover:bg-purple-50 hover:text-purple-600 transition-all disabled:opacity-50"
                               >
                                 <AlertTriangle className="w-4 h-4" />
                                 Return

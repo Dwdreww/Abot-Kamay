@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion } from 'motion/react';
 import { Download, Printer, Eye, ChevronLeft, FileText, Calendar, User, MapPin, Hash, CheckSquare, Square, CheckCircle, Loader2, Send } from 'lucide-react';
 import { generateRef, cn } from '../../../lib/utils';
@@ -6,13 +6,17 @@ import { generateApplicationReference } from '../../../lib/applicationService';
 import { useAuth } from '../../../App';
 import { db } from '../../../lib/firebase';
 import { collection, doc, setDoc, addDoc, serverTimestamp } from 'firebase/firestore';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 
 export default function CancellationForm() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [refNo] = useState(generateRef());
+  const [refNo, setRefNo] = useState(generateRef());
   const [showPreview, setShowPreview] = useState(false);
+  const previewRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState({
     fullName: '',
     address: '',
@@ -39,7 +43,8 @@ export default function CancellationForm() {
     try {
       const newDocRef = doc(collection(db, 'applications'));
       const actualRefNo = await generateApplicationReference();
-      
+      setRefNo(actualRefNo);
+
       const payload = {
         applicationId: newDocRef.id,
         referenceNumber: actualRefNo,
@@ -79,6 +84,47 @@ export default function CancellationForm() {
       alert(`Failed to submit application: ${err instanceof Error ? err.message : 'Please try again.'}`);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDownload = async () => {
+    const el = previewRef.current;
+    if (!el) return;
+    setDownloading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
+      const pageW = 215.9;
+      const pageH = 279.4;
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [pageW, pageH] });
+      const imgW = pageW;
+      const pageHeightPx = Math.floor((canvas.width * pageH) / pageW);
+      let offset = 0;
+      let firstPage = true;
+      while (offset < canvas.height) {
+        if (!firstPage) pdf.addPage();
+        firstPage = false;
+        const slice = document.createElement('canvas');
+        slice.width = canvas.width;
+        slice.height = Math.min(pageHeightPx, canvas.height - offset);
+        slice.getContext('2d')!.drawImage(canvas, 0, -offset);
+        const sliceH = (slice.height * imgW) / canvas.width;
+        pdf.addImage(slice.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, imgW, sliceH);
+        offset += pageHeightPx;
+      }
+      const blob = pdf.output('blob');
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Certificate_of_Cancellation_${refNo}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (err) {
+      console.error('PDF generation failed', err);
+    } finally {
+      setDownloading(false);
     }
   };
 
@@ -295,15 +341,19 @@ export default function CancellationForm() {
                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                    Submit Request
                  </button>
-                 <button className="px-8 py-4 bg-emerald-600 text-white font-black rounded-2xl hover:bg-emerald-500 transition-all shadow-xl shadow-emerald-200 flex items-center gap-3 text-[10px] uppercase tracking-widest">
-                    <Download className="w-5 h-5" />
-                    Export PDF
+                 <button
+                   onClick={handleDownload}
+                   disabled={downloading}
+                   className="px-8 py-4 bg-emerald-600 text-white font-black rounded-2xl hover:bg-emerald-500 transition-all shadow-xl shadow-emerald-200 flex items-center gap-3 text-[10px] uppercase tracking-widest disabled:opacity-50"
+                 >
+                    {downloading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
+                    {downloading ? 'Generating...' : 'Export PDF'}
                  </button>
               </div>
            </div>
 
            {/* Cancellation Certificate Preview */}
-           <div className="bg-white p-16 md:p-24 shadow-2xl rounded-sm border-t-[12px] border-blue-900 max-w-[850px] mx-auto min-h-[1100px] flex flex-col relative overflow-hidden">
+           <div ref={previewRef} className="bg-white p-16 md:p-24 shadow-2xl rounded-sm border-t-[12px] border-blue-900 max-w-[850px] mx-auto min-h-[1100px] flex flex-col relative overflow-hidden">
               {/* Watermark/Seal background */}
               <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none">
                  <div className="w-[600px] h-[600px] border-[40px] border-blue-900 rounded-full flex items-center justify-center">
