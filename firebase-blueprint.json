@@ -1,0 +1,176 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "System users including admins, staff, and PWD members.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "name": { "type": "string" },
+        "contactNumber": { "type": "string" },
+        "address": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "staff", "member"] },
+        "email": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "deactivated"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "name", "role", "email"]
+    },
+    "PWDProfile": {
+      "title": "PWD Profile",
+      "description": "Detailed records of Persons with Disabilities.",
+      "type": "object",
+      "properties": {
+        "pwdNumber": { "type": "string" },
+        "lastName": { "type": "string" },
+        "firstName": { "type": "string" },
+        "middleName": { "type": "string" },
+        "suffix": { "type": "string" },
+        "disabilityType": { "type": "string" },
+        "disabilityCause": { "type": "string" },
+        "address": { "type": "string" },
+        "barangay": { "type": "string" },
+        "city": { "type": "string" },
+        "province": { "type": "string" },
+        "contactNumber": { "type": "string" },
+        "email": { "type": "string" },
+        "dob": { "type": "string" },
+        "sex": { "type": "string" },
+        "civilStatus": { "type": "string" },
+        "educationalAttainment": { "type": "string" },
+        "employmentStatus": { "type": "string" },
+        "occupation": { "type": "string" },
+        "bloodType": { "type": "string" },
+        "orgAffiliated": { "type": "string" },
+        "idReferences": { "type": "object" },
+        "familyBackground": { "type": "object" },
+        "dateRegistered": { "type": "string", "format": "date-time" },
+        "status": { "type": "string" }
+      }
+    },
+    "BurialAssistance": {
+      "title": "Burial Assistance Application",
+      "description": "Applications for burial assistance for PWDs.",
+      "type": "object",
+      "properties": {
+        "referenceNumber": { "type": "string" },
+        "deceasedName": { "type": "string" },
+        "pwdId": { "type": "string" },
+        "claimantName": { "type": "string" },
+        "contactNumber": { "type": "string" },
+        "relationship": { "type": "string" },
+        "address": { "type": "string" },
+        "funeralService": { "type": "string" },
+        "requirements": { "type": "object" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "PRPWDApplication": {
+      "title": "PRPWD Application",
+      "description": "Department of Health Philippine Registry for Persons with Disability Application.",
+      "type": "object",
+      "properties": {
+        "referenceNumber": { "type": "string" },
+        "type": { "type": "string", "enum": ["new", "renewal"] },
+        "pwdNumber": { "type": "string" },
+        "lastName": { "type": "string" },
+        "firstName": { "type": "string" },
+        "disabilityTypes": { "type": "array" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "BarangayCertification": {
+      "title": "Barangay Certification",
+      "description": "Generated barangay certification records.",
+      "type": "object",
+      "properties": {
+        "referenceNumber": { "type": "string" },
+        "date": { "type": "string" },
+        "deceasedName": { "type": "string" },
+        "claimantName": { "type": "string" },
+        "purpose": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Announcement": {
+      "title": "Announcement",
+      "description": "Updates and notices for PWD members.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "category": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "authorId": { "type": "string" }
+      }
+    },
+    "MembershipCancellation": {
+      "title": "Membership Cancellation",
+      "description": "Requests to cancel PWD membership.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "referenceNumber": { "type": "string" },
+        "fullName": { "type": "string" },
+        "pwdId": { "type": "string" },
+        "address": { "type": "string" },
+        "effectiveDate": { "type": "string" },
+        "reasons": { "type": "object" },
+        "otherReason": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "AuditLog": {
+      "title": "Audit Log",
+      "description": "System audit logs.",
+      "type": "object",
+      "properties": {
+        "action": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "targetId": { "type": "string" },
+        "targetType": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "firestore": {
+    "users": {
+      "schema": "User",
+      "description": "User profiles and credentials."
+    },
+    "pwd_profiles": {
+      "schema": "PWDProfile",
+      "description": "Core PWD database."
+    },
+    "burial_assistance": {
+      "schema": "BurialAssistance",
+      "description": "Burial assistance applications."
+    },
+    "prpwd_applications": {
+      "schema": "PRPWDApplication",
+      "description": "DOH PRPWD applications."
+    },
+    "certifications": {
+      "schema": "BarangayCertification",
+      "description": "Barangay certification records."
+    },
+    "announcements": {
+      "schema": "Announcement",
+      "description": "Public notices."
+    },
+    "membership_cancellation": {
+      "schema": "MembershipCancellation",
+      "description": "PWD membership cancellation requests."
+    },
+    "audit_logs": {
+      "schema": "AuditLog",
+      "description": "System action audit logs."
+    }
+  }
+}
