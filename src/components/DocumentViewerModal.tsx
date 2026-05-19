@@ -4,6 +4,7 @@ import { db } from '../lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { applyPdfCaptureColorFallbacks } from '../lib/pdfCapture';
 
 interface DocumentViewerModalProps {
   isOpen: boolean;
@@ -415,38 +416,6 @@ function SignatureBlock({ submittedAt }: { submittedAt?: any }) {
 }
 
 /* ─── Main Modal ──────────────────────────────────────────── */
-const pdfCaptureColorFallbacks = `
-  [data-pdf-capture], [data-pdf-capture] * {
-    color: #111827;
-    background-image: none;
-    border-color: #e5e7eb;
-    box-shadow: none;
-    outline-color: #111827;
-    text-decoration-color: currentColor;
-    text-shadow: none;
-  }
-  [data-pdf-capture] {
-    background-color: #ffffff;
-    border-color: #f1f5f9;
-  }
-  [data-pdf-capture] * {
-    background-color: transparent;
-  }
-  [data-pdf-capture] .bg-white { background-color: #ffffff; }
-  [data-pdf-capture] .bg-neutral-900 { background-color: #171717; }
-  [data-pdf-capture] .bg-slate-100 { background-color: #f1f5f9; }
-  [data-pdf-capture] .text-white { color: #ffffff; }
-  [data-pdf-capture] .text-neutral-900 { color: #171717; }
-  [data-pdf-capture] .text-neutral-800 { color: #262626; }
-  [data-pdf-capture] .text-neutral-700 { color: #404040; }
-  [data-pdf-capture] .text-neutral-600 { color: #525252; }
-  [data-pdf-capture] .text-neutral-500 { color: #737373; }
-  [data-pdf-capture] .text-neutral-400 { color: #a3a3a3; }
-  [data-pdf-capture] .text-blue-600 { color: #2563eb; }
-  [data-pdf-capture] .border-neutral-800 { border-color: #262626; }
-  [data-pdf-capture] .border-neutral-200 { border-color: #e5e5e5; }
-`;
-
 export default function DocumentViewerModal({
   isOpen, onClose, docId, collectionName, autoDownload, previewData
 }: DocumentViewerModalProps) {
@@ -507,11 +476,7 @@ export default function DocumentViewerModal({
         backgroundColor: '#ffffff',
         logging: false,
         removeContainer: true,
-        onclone: (clonedDocument) => {
-          const style = clonedDocument.createElement('style');
-          style.textContent = pdfCaptureColorFallbacks;
-          clonedDocument.head.appendChild(style);
-        },
+        onclone: applyPdfCaptureColorFallbacks,
       });
 
       const pdf = new jsPDF({

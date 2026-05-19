@@ -8,6 +8,7 @@ import { db } from '../../../lib/firebase';
 import { collection, doc, setDoc, addDoc, serverTimestamp } from 'firebase/firestore';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
+import { applyPdfCaptureColorFallbacks } from '../../../lib/pdfCapture';
 
 export default function CancellationForm() {
   const { user } = useAuth();
@@ -93,7 +94,13 @@ export default function CancellationForm() {
     setDownloading(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 100));
-      const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
+      const canvas = await html2canvas(el, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        onclone: applyPdfCaptureColorFallbacks,
+      });
       const pageW = 215.9;
       const pageH = 279.4;
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [pageW, pageH] });
@@ -353,7 +360,7 @@ export default function CancellationForm() {
            </div>
 
            {/* Cancellation Certificate Preview */}
-           <div ref={previewRef} className="bg-white p-16 md:p-24 shadow-2xl rounded-sm border-t-[12px] border-blue-900 max-w-[850px] mx-auto min-h-[1100px] flex flex-col relative overflow-hidden">
+           <div ref={previewRef} data-pdf-capture className="bg-white p-16 md:p-24 shadow-2xl rounded-sm border-t-[12px] border-blue-900 max-w-[850px] mx-auto min-h-[1100px] flex flex-col relative overflow-hidden">
               {/* Watermark/Seal background */}
               <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none">
                  <div className="w-[600px] h-[600px] border-[40px] border-blue-900 rounded-full flex items-center justify-center">

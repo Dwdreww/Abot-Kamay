@@ -12,6 +12,7 @@ import html2canvas from 'html2canvas';
 import { db } from '../../../lib/firebase';
 import { doc, setDoc, updateDoc, serverTimestamp, collection, addDoc } from 'firebase/firestore';
 import { useAuth } from '../../../App';
+import { applyPdfCaptureColorFallbacks } from '../../../lib/pdfCapture';
 
 export default function BurialForm() {
   const { user } = useAuth();
@@ -169,7 +170,13 @@ export default function BurialForm() {
     setLoading(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 100));
-      const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        onclone: applyPdfCaptureColorFallbacks,
+      });
       const pageW = 215.9;
       const pageH = 279.4;
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [pageW, pageH] });
@@ -205,7 +212,7 @@ export default function BurialForm() {
   };
 
   const previewContent = (
-    <div id="form-p-preview" className="max-w-[700px] mx-auto bg-white p-10 select-none shadow-sm h-full flex flex-col justify-between">
+    <div id="form-p-preview" data-pdf-capture className="max-w-[700px] mx-auto bg-white p-10 select-none shadow-sm h-full flex flex-col justify-between">
       <div>
         {/* Letterhead */}
         <div className="flex items-center justify-between mb-10">

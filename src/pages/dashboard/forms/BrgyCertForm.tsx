@@ -7,6 +7,7 @@ import { db } from '../../../lib/firebase';
 import { collection, addDoc, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
+import { applyPdfCaptureColorFallbacks } from '../../../lib/pdfCapture';
 
 export default function BrgyCertForm() {
   const { user } = useAuth();
@@ -88,7 +89,13 @@ export default function BrgyCertForm() {
     setDownloading(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 100));
-      const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
+      const canvas = await html2canvas(el, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        onclone: applyPdfCaptureColorFallbacks,
+      });
       const pageW = 215.9;
       const pageH = 279.4;
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [pageW, pageH] });
@@ -266,7 +273,7 @@ export default function BrgyCertForm() {
            </div>
 
            {/* Letter Preview */}
-           <div ref={previewRef} className="bg-white p-20 shadow-2xl rounded-sm border border-neutral-100 max-w-[800px] mx-auto min-h-[1000px] flex flex-col">
+           <div ref={previewRef} data-pdf-capture className="bg-white p-20 shadow-2xl rounded-sm border border-neutral-100 max-w-[800px] mx-auto min-h-[1000px] flex flex-col">
               {/* Header */}
               <div className="text-center border-b-2 border-double border-neutral-900 pb-8 mb-12">
                  <p className="text-sm font-bold uppercase tracking-widest text-neutral-800">Republika ng Pilipinas</p>
