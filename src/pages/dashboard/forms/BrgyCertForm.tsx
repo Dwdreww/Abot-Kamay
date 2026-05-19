@@ -267,7 +267,7 @@ export default function BrgyCertForm() {
                    className="px-6 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition-all shadow-md shadow-green-600/20 flex items-center gap-2 disabled:opacity-50"
                  >
                     {downloading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
-                    {downloading ? 'Generating...' : 'I-export ang PDF'}
+                    {downloading ? 'Ginagawa...' : 'I-export ang PDF'}
                  </button>
               </div>
            </div>
@@ -327,7 +327,7 @@ export default function BrgyCertForm() {
 
               <div className="mt-auto pt-12 text-center">
                  <div className="w-32 h-32 border-4 border-blue-900/10 rounded-full mx-auto flex items-center justify-center opacity-30">
-                    <p className="text-[10px] font-bold text-blue-900 text-center uppercase tracking-widest leading-none">Official<br/>Barangay<br/>Dry Seal</p>
+                    <p className="text-[10px] font-bold text-blue-900 text-center uppercase tracking-widest leading-none">Opisyal na<br/>Selyo ng<br/>Barangay</p>
                  </div>
               </div>
            </div>

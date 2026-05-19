@@ -223,7 +223,7 @@ export default function BurialForm() {
           <div className="text-right text-xs font-bold text-neutral-800 leading-snug">
             <p>Persons with Disability Affairs Office (PDAO)</p>
             <p>City Social Welfare Development Office</p>
-            <p>City of Dasmariñas</p>
+            <p>Lungsod ng Dasmarinas</p>
           </div>
         </div>
 

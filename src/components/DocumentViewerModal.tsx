@@ -46,7 +46,7 @@ function BurialAssistancePreview({ data }: { data: any }) {
         <div className="text-right text-[10px] font-bold text-neutral-700 leading-snug">
           <p>Persons with Disability Affairs Office (PDAO)</p>
           <p>City Social Welfare Development Office</p>
-          <p>City of Dasmariñas</p>
+          <p>Lungsod ng Dasmarinas</p>
         </div>
       </div>
       <div className="text-center mb-8">
@@ -346,10 +346,10 @@ function BrgyCertPreview({ data }: { data: any }) {
   return (
     <>
       <div className="text-center mb-8">
-        <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Republic of the Philippines</p>
-        <p className="text-[10px] font-bold text-neutral-500">Province of Cavite</p>
+        <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Republika ng Pilipinas</p>
+        <p className="text-[10px] font-bold text-neutral-500">Lalawigan ng Cavite</p>
         <h2 className="text-lg font-black text-neutral-900 uppercase tracking-wide mt-2">Barangay San Antonio de Padua 1</h2>
-        <p className="text-[10px] font-bold text-neutral-500">City of Dasmariñas, Cavite</p>
+        <p className="text-[10px] font-bold text-neutral-500">Lungsod ng Dasmarinas, Cavite</p>
       </div>
       <div className="text-center mb-6">
         <div className="inline-block bg-neutral-900 text-white text-sm font-black uppercase tracking-widest px-8 py-2.5 rounded-xl">
@@ -375,15 +375,15 @@ function CancellationPreview({ data }: { data: any }) {
   return (
     <>
       <div className="text-center mb-8">
-        <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Republic of the Philippines</p>
-        <h2 className="text-lg font-black text-neutral-900 uppercase tracking-wide mt-2">Certificate of Cancellation</h2>
-        <h3 className="text-[12px] font-bold text-neutral-600">PWD Membership Cancellation Form</h3>
+        <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Republika ng Pilipinas</p>
+        <h2 className="text-lg font-black text-neutral-900 uppercase tracking-wide mt-2">Sertipiko ng Pagkansela</h2>
+        <h3 className="text-[12px] font-bold text-neutral-600">Form ng Pagkansela ng PWD Membership</h3>
         <p className="text-[10px] font-mono mt-2 text-neutral-400">Ref No: {data.referenceNumber}</p>
       </div>
       <SectionTitle>Impormasyon ng Miyembro</SectionTitle>
       <div className="space-y-1">
         <Field label="Buong Pangalan"  value={data.applicantName} />
-        <Field label="Address"         value={data.address} />
+        <Field label="Tirahan"         value={data.address} />
         <Field label="Contact No."     value={data.contactNumber} />
         <Field label="Email"           value={data.applicantEmail} />
         <Field label="Dahilan"         value={fd.reason} />
@@ -634,17 +634,17 @@ export default function DocumentViewerModal({
     return (
       <>
         <div className="text-center mb-6">
-          <h2 className="text-lg font-black uppercase tracking-wide">{appData.formTitle || 'Application Form'}</h2>
+          <h2 className="text-lg font-black uppercase tracking-wide">{appData.formTitle || 'Form ng Aplikasyon'}</h2>
           <p className="text-[10px] font-mono text-neutral-400 mt-1">Ref: {appData.referenceNumber}</p>
         </div>
         <div className="space-y-1">
-          <Field label="Applicant"     value={appData.applicantName} />
+          <Field label="Aplikante"     value={appData.applicantName} />
           <Field label="Email"         value={appData.applicantEmail} />
-          <Field label="Contact"       value={appData.contactNumber} />
-          <Field label="Address"       value={appData.address} />
-          <Field label="Disability"    value={appData.disabilityType} />
+          <Field label="Contact No."   value={appData.contactNumber} />
+          <Field label="Tirahan"       value={appData.address} />
+          <Field label="Kapansanan"    value={appData.disabilityType} />
           <Field label="Status"        value={appData.status} />
-          {appData.remarks && <Field label="Remarks" value={appData.remarks} />}
+          {appData.remarks && <Field label="Puna" value={appData.remarks} />}
         </div>
         <SignatureBlock submittedAt={appData.submittedAt} />
       </>
@@ -661,8 +661,8 @@ export default function DocumentViewerModal({
               <FileText className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">Document Preview</h3>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Encrypted Official Record</p>
+              <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">Preview ng Dokumento</h3>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Opisyal na Rekord</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -680,7 +680,7 @@ export default function DocumentViewerModal({
                   className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all disabled:opacity-60"
                 >
                   {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-                  Download PDF
+                  I-download ang PDF
                 </button>
               </>
             )}
@@ -719,7 +719,7 @@ export default function DocumentViewerModal({
         <div className="shrink-0 px-7 py-4 bg-white rounded-b-3xl border-t border-slate-100 flex items-center justify-between">
           <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-slate-300 inline-block" />
-            Authorized for Private Use Only
+            Para sa pribadong paggamit lamang
           </p>
           <button onClick={onClose} className="text-[10px] font-black text-slate-400 hover:text-slate-700 uppercase tracking-widest transition-colors">
             Close Preview
