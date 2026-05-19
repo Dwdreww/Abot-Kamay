@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   UserCog, Shield, User, Mail, Search, Plus,
   MoreVertical, ShieldCheck, ShieldAlert,
@@ -10,7 +10,7 @@ import { cn } from '../../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 import { initializeApp, deleteApp } from 'firebase/app';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, doc, onSnapshot, query, serverTimestamp, setDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import firebaseConfig from '../../../firebase-applet-config.json';
 
@@ -19,6 +19,48 @@ import firebaseConfig from '../../../firebase-applet-config.json';
 interface NewUserModalProps {
   isOpen: boolean;
   onClose: () => void;
+}
+
+type ManagedUser = {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  rawRole: string;
+  status: string;
+  lastLogin: string;
+  permissions: string[];
+  contactNumber?: string;
+};
+
+function roleLabel(role: string) {
+  if (role === 'admin') return 'System Admin';
+  if (role === 'staff') return 'Kawani ng Barangay';
+  return 'Miyembro ng PWD';
+}
+
+function statusLabel(status?: string) {
+  return status === 'deactivated' ? 'Hindi Aktibo' : 'Aktibo';
+}
+
+function permissionsForRole(role: string) {
+  if (role === 'admin') return ['all'];
+  if (role === 'staff') return ['read', 'write', 'verify'];
+  return ['read', 'apply'];
+}
+
+function formatLastLogin(value: any) {
+  const date = value?.toDate?.() || value;
+  if (date instanceof Date && !Number.isNaN(date.getTime())) {
+    return date.toLocaleDateString('fil-PH', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+  return 'Hindi pa nakakapag-login';
 }
 
 function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
@@ -320,15 +362,69 @@ function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function UserManagement() {
-  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [selectedUser, setSelectedUser] = useState<ManagedUser | null>(null);
   const [isNewUserModalOpen, setIsNewUserModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [systemUsers, setSystemUsers] = useState<ManagedUser[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(true);
+  const [usersError, setUsersError] = useState<string | null>(null);
 
-  const systemUsers = [
-    { id: 'USR-001', name: 'Marlene Garcia', email: 'm.garcia@sadp.gov.ph', role: 'System Admin', status: 'Aktibo', lastLogin: '12 minuto na ang nakalipas', permissions: ['all'] },
-    { id: 'USR-002', name: 'Ricardo Santos', email: 'r.santos@sadp.gov.ph', role: 'Kawani ng Barangay', status: 'Aktibo', lastLogin: '2 oras na ang nakalipas', permissions: ['read', 'write', 'verify'] },
-    { id: 'USR-003', name: 'Elena Guerrero', email: 'e.guerrero@email.com', role: 'Miyembro ng PWD', status: 'Aktibo', lastLogin: '1 araw na ang nakalipas', permissions: ['read', 'apply'] },
-    { id: 'USR-004', name: 'Mateo Rizal', email: 'm.rizal@sadp.gov.ph', role: 'Kawani ng Barangay', status: 'Hindi Aktibo', lastLogin: '5 araw na ang nakalipas', permissions: ['read', 'write'] },
-  ];
+  useEffect(() => {
+    setLoadingUsers(true);
+    const unsubscribe = onSnapshot(
+      query(collection(db, 'users')),
+      (snapshot) => {
+        const users = snapshot.docs
+          .map((userDoc) => {
+            const data = userDoc.data();
+            const rawRole = data.role || 'member';
+            return {
+              id: data.uid || userDoc.id,
+              name: data.name || 'Walang pangalan',
+              email: data.email || 'Walang email',
+              role: roleLabel(rawRole),
+              rawRole,
+              status: statusLabel(data.status),
+              lastLogin: formatLastLogin(data.lastLogin),
+              permissions: permissionsForRole(rawRole),
+              contactNumber: data.contactNumber || '',
+              createdAt: data.createdAt?.toMillis?.() || 0,
+            };
+          })
+          .sort((a, b) => b.createdAt - a.createdAt)
+          .map(({ createdAt, ...user }) => user);
+
+        setSystemUsers(users);
+        setUsersError(null);
+        setLoadingUsers(false);
+      },
+      (error) => {
+        console.error('Failed to load users:', error);
+        setUsersError('Hindi makuha ang listahan ng gumagamit.');
+        setLoadingUsers(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (!selectedUser) return;
+    const latestUser = systemUsers.find(user => user.id === selectedUser.id);
+    if (latestUser) {
+      setSelectedUser(latestUser);
+    }
+  }, [systemUsers, selectedUser?.id]);
+
+  const filteredUsers = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return systemUsers;
+    return systemUsers.filter(user =>
+      user.name.toLowerCase().includes(term) ||
+      user.email.toLowerCase().includes(term) ||
+      user.role.toLowerCase().includes(term)
+    );
+  }, [searchTerm, systemUsers]);
 
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
@@ -376,6 +472,8 @@ export default function UserManagement() {
                      <input
                        type="text"
                        placeholder="Maghanap ayon sa pangalan, email, o papel..."
+                       value={searchTerm}
+                       onChange={e => setSearchTerm(e.target.value)}
                        className="w-full pl-14 pr-6 py-5 bg-slate-50 border-none rounded-2xl text-[11px] font-black uppercase tracking-widest outline-none transition-all placeholder:text-slate-300"
                      />
                   </div>
@@ -392,7 +490,28 @@ export default function UserManagement() {
                         </tr>
                      </thead>
                      <tbody className="divide-y divide-slate-50">
-                        {systemUsers.map((u) => (
+                        {loadingUsers ? (
+                          <tr>
+                            <td colSpan={selectedUser ? 2 : 4} className="px-10 py-16 text-center">
+                              <div className="flex flex-col items-center gap-3 text-slate-400">
+                                <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+                                <span className="text-[10px] font-black uppercase tracking-widest">Nilo-load ang mga gumagamit...</span>
+                              </div>
+                            </td>
+                          </tr>
+                        ) : usersError ? (
+                          <tr>
+                            <td colSpan={selectedUser ? 2 : 4} className="px-10 py-16 text-center text-red-500 text-xs font-black uppercase tracking-widest">
+                              {usersError}
+                            </td>
+                          </tr>
+                        ) : filteredUsers.length === 0 ? (
+                          <tr>
+                            <td colSpan={selectedUser ? 2 : 4} className="px-10 py-16 text-center text-slate-400 text-xs font-black uppercase tracking-widest">
+                              Walang gumagamit na tumutugma sa paghahanap.
+                            </td>
+                          </tr>
+                        ) : filteredUsers.map((u) => (
                           <tr
                             key={u.id}
                             onClick={() => setSelectedUser(u)}
