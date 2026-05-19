@@ -55,7 +55,7 @@ export default function Announcements() {
       summary: 'Panatilihin ang iyong mga benepisyo sa pamamagitan ng pag-renew ng iyong PWD ID. Tingnan ang mga update na requirement dito.',
       category: 'Renewal',
       date: 'Mabisa ngayong 2024',
-      image: 'public/renewal.png',
+      image: '/renewal.png',
       icon: <Pin className="w-4 h-4" />,
       fullContent: (
         <div className="space-y-6">
@@ -93,7 +93,7 @@ export default function Announcements() {
       summary: 'Mga update ng National Council on Disability Affairs (NCDA) sa mga kinikilalang kondisyong medikal.',
       category: 'Opisyal',
       date: 'Advisory ng NCDA',
-      image: 'public/listofpwd.png',
+      image: '/listofpwd.png',
       icon: <ShieldCheck className="w-4 h-4" />,
       fullContent: (
         <div className="space-y-8">
