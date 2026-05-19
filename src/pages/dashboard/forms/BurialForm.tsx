@@ -384,7 +384,7 @@ export default function BurialForm() {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-8 sticky top-20 z-10 bg-neutral-50/80 backdrop-blur-md py-4 rounded-b-xl border-b border-neutral-200">
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-8 bg-neutral-50 py-4 rounded-b-xl border-b border-neutral-200">
         <div className="flex items-center gap-2">
           <span className="text-xs font-bold text-neutral-400 uppercase tracking-widest pl-2">Seksyon: Form ng Burial Assistance</span>
         </div>
