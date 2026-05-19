@@ -152,7 +152,7 @@ function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 py-6 sm:py-8">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
@@ -164,7 +164,7 @@ function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
         transition={{ duration: 0.2 }}
-        className="relative w-full max-w-lg bg-white rounded-[40px] shadow-2xl shadow-slate-900/20 overflow-hidden"
+        className="relative my-auto w-full max-w-lg max-h-[calc(100vh-3rem)] bg-white rounded-[40px] shadow-2xl shadow-slate-900/20 overflow-y-auto"
       >
         {/* Modal Header */}
         <div className="flex items-center justify-between px-10 pt-10 pb-8 border-b border-slate-50">
@@ -665,9 +665,9 @@ export default function UserManagement() {
                              <Key className="w-5 h-5 text-slate-400 group-hover:text-blue-600 transition-colors" />
                              <span className="text-[8px] font-black text-slate-400 group-hover:text-slate-900 uppercase tracking-widest text-center leading-tight">I-reset ang Password</span>
                           </button>
-                          <button className="flex flex-col items-center justify-center gap-2 p-5 bg-slate-50 border border-slate-100 rounded-3xl group transition-all hover:bg-white hover:shadow-xl hover:shadow-orange-200/50 hover:border-orange-100 w-28">
-                             <Lock className="w-5 h-5 text-slate-400 group-hover:text-orange-600 transition-colors" />
-                             <span className="text-[8px] font-black text-slate-400 group-hover:text-slate-900 uppercase tracking-widest text-center leading-tight">Suspindihin</span>
+                          <button className="flex flex-col items-center justify-center gap-2 p-5 bg-slate-50 border border-slate-100 rounded-3xl group transition-all hover:bg-white hover:shadow-xl hover:shadow-red-200/50 hover:border-red-100 w-28">
+                             <Trash2 className="w-5 h-5 text-slate-400 group-hover:text-red-600 transition-colors" />
+                             <span className="text-[8px] font-black text-slate-400 group-hover:text-slate-900 uppercase tracking-widest text-center leading-tight">Delete</span>
                           </button>
                        </div>
                        <div className="flex gap-3 flex-grow lg:flex-grow-0">
