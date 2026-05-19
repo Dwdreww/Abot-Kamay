@@ -373,7 +373,7 @@ export default function Dashboard() {
               >
                 {activeView === 'overview' && <Overview onNavigate={navigateTo} />}
                 {activeView === 'pwd' && <PWDProfiles />}
-                {activeView === 'forms' && <DigitalForms />}
+                {activeView === 'forms' && <DigitalForms onViewApplications={() => navigateTo('tracking')} />}
                 {activeView === 'tracking' && <ApplicationTracking initialFilter={trackingFilter} />}
                 {activeView === 'verification' && <RequirementsVerification />}
                 {activeView === 'review' && <ApplicationReview />}

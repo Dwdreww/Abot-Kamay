@@ -27,7 +27,7 @@ interface Submission {
   rawDate: Date;
 }
 
-export default function DigitalForms() {
+export default function DigitalForms({ onViewApplications }: { onViewApplications: () => void }) {
   const { user } = useAuth();
   const [selectedForm, setSelectedForm] = useState<FormType>('none');
   const [submissions, setSubmissions] = useState<Submission[]>([]);
@@ -213,7 +213,10 @@ export default function DigitalForms() {
                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Sundan ang progreso ng iyong mga isinumiteng rekord.</p>
               </div>
             </div>
-            <button className="shrink-0 text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline flex items-center gap-2">
+            <button
+              onClick={onViewApplications}
+              className="shrink-0 text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline flex items-center gap-2"
+            >
               Tingnan Lahat <ChevronRight className="w-4 h-4" />
             </button>
           </div>
