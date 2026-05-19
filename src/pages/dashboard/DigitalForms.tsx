@@ -200,10 +200,10 @@ export default function DigitalForms() {
         })}
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-10">
+      <div className="grid gap-8 2xl:grid-cols-[minmax(0,1fr)_360px] items-start">
         {/* Recent Forms Table */}
-        <div className="lg:col-span-2 bg-white rounded-[50px] border border-slate-100 shadow-2xl shadow-slate-200/20 overflow-hidden flex flex-col">
-          <div className="px-12 py-10 border-b border-slate-50 flex items-center justify-between">
+        <div className="min-w-0 bg-white rounded-[40px] border border-slate-100 shadow-2xl shadow-slate-200/20 overflow-hidden flex flex-col">
+          <div className="px-6 py-7 sm:px-8 border-b border-slate-50 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center">
                 <FileText className="w-6 h-6" />
@@ -213,25 +213,32 @@ export default function DigitalForms() {
                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Sundan ang progreso ng iyong mga isinumiteng rekord.</p>
               </div>
             </div>
-            <button className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline flex items-center gap-2">
+            <button className="shrink-0 text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline flex items-center gap-2">
               Tingnan Lahat <ChevronRight className="w-4 h-4" />
             </button>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-left font-sans">
+            <table className="w-full min-w-[760px] table-fixed text-left font-sans">
+              <colgroup>
+                <col className="w-[26%]" />
+                <col className="w-[20%]" />
+                <col className="w-[20%]" />
+                <col className="w-[17%]" />
+                <col className="w-[17%]" />
+              </colgroup>
               <thead className="bg-[#fcfdff]">
                 <tr>
-                  <th className="px-12 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Uri ng Form</th>
-                  <th className="px-12 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Pangalan ng PWD</th>
-                  <th className="px-12 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">ID ng Form</th>
-                  <th className="px-12 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Petsa ng Pagpasa</th>
-                  <th className="px-12 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
+                  <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Uri ng Form</th>
+                  <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Pangalan ng PWD</th>
+                  <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">ID ng Form</th>
+                  <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Petsa ng Pagpasa</th>
+                  <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {loading ? (
                   <tr>
-                    <td colSpan={5} className="px-12 py-10 text-center">
+                    <td colSpan={5} className="px-6 py-10 text-center">
                       <div className="flex flex-col items-center gap-2">
                         <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Nilo-load ang mga submission...</span>
@@ -241,13 +248,13 @@ export default function DigitalForms() {
                 ) : submissions.length > 0 ? (
                   submissions.map((row, i) => (
                     <tr key={i} className="group hover:bg-slate-50/50 transition-colors">
-                      <td className="px-12 py-6 text-[11px] font-extrabold text-slate-900 uppercase tracking-tight">{row.type}</td>
-                      <td className="px-12 py-6 text-[11px] font-bold text-slate-500 uppercase tracking-widest">{row.name}</td>
-                      <td className="px-12 py-6 text-[10px] font-black font-mono text-slate-400">{row.refNo}</td>
-                      <td className="px-12 py-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">{row.date}</td>
-                      <td className="px-12 py-6">
+                      <td className="px-6 py-5 text-[11px] font-extrabold text-slate-900 uppercase tracking-tight leading-snug">{row.type}</td>
+                      <td className="px-6 py-5 text-[11px] font-bold text-slate-500 uppercase tracking-widest leading-snug">{row.name}</td>
+                      <td className="px-6 py-5 text-[10px] font-black font-mono text-slate-400 whitespace-nowrap">{row.refNo}</td>
+                      <td className="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">{row.date}</td>
+                      <td className="px-6 py-5 text-right">
                         <span className={cn(
-                          "px-4 py-1.5 text-[9px] font-black rounded-full uppercase tracking-widest shadow-sm",
+                          "inline-flex px-3 py-1.5 text-[9px] font-black rounded-full uppercase tracking-widest shadow-sm whitespace-nowrap",
                           row.color === 'emerald' ? "bg-emerald-50 text-emerald-600" :
                           row.color === 'blue'    ? "bg-blue-50 text-blue-600 shadow-blue-100" :
                           row.color === 'yellow'  ? "bg-yellow-50 text-yellow-600" :
@@ -269,7 +276,7 @@ export default function DigitalForms() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="px-12 py-20 text-center text-slate-400 uppercase text-[10px] font-black tracking-widest">
+                    <td colSpan={5} className="px-6 py-20 text-center text-slate-400 uppercase text-[10px] font-black tracking-widest">
                       Walang bagong submission
                     </td>
                   </tr>
@@ -285,7 +292,7 @@ export default function DigitalForms() {
         </div>
 
         {/* Guidance Column */}
-        <div className="space-y-6">
+        <div className="space-y-6 2xl:w-[360px]">
            <div className="bg-blue-600 rounded-[40px] p-8 text-white relative overflow-hidden shadow-xl shadow-blue-200">
               <div className="relative z-10 space-y-6">
                   <div className="bg-white/20 w-12 h-12 rounded-2xl flex items-center justify-center">
