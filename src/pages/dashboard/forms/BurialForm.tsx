@@ -180,21 +180,14 @@ export default function BurialForm() {
       const pageW = 215.9;
       const pageH = 279.4;
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [pageW, pageH] });
-      const imgW = pageW;
-      const pageHeightPx = Math.floor((canvas.width * pageH) / pageW);
-      let offset = 0;
-      let firstPage = true;
-      while (offset < canvas.height) {
-        if (!firstPage) pdf.addPage();
-        firstPage = false;
-        const slice = document.createElement('canvas');
-        slice.width = canvas.width;
-        slice.height = Math.min(pageHeightPx, canvas.height - offset);
-        slice.getContext('2d')!.drawImage(canvas, 0, -offset);
-        const sliceH = (slice.height * imgW) / canvas.width;
-        pdf.addImage(slice.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, imgW, sliceH);
-        offset += pageHeightPx;
-      }
+      const imgData = canvas.toDataURL('image/jpeg', 0.92);
+      const imgH = (canvas.height * pageW) / canvas.width;
+      const fitScale = Math.min(1, pageH / imgH);
+      const imgW = pageW * fitScale;
+      const fittedImgH = imgH * fitScale;
+      const x = (pageW - imgW) / 2;
+      const y = (pageH - fittedImgH) / 2;
+      pdf.addImage(imgData, 'JPEG', x, y, imgW, fittedImgH);
       const blob = pdf.output('blob');
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
