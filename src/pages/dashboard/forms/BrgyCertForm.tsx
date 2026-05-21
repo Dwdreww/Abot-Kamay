@@ -277,8 +277,8 @@ export default function BrgyCertForm() {
               {/* Header */}
               <div className="text-center border-b-2 border-double border-neutral-900 pb-8 mb-12">
                  <p className="text-sm font-bold uppercase tracking-widest text-neutral-800">Republika ng Pilipinas</p>
-                 <p className="text-sm text-neutral-600">Lalawigan ng [Pangalan ng Lalawigan]</p>
-                 <p className="text-sm text-neutral-600">Lungsod ng [Pangalan ng Lungsod]</p>
+                 <p className="text-sm text-neutral-600">Lalawigan ng Kabite</p>
+                 <p className="text-sm text-neutral-600">Lungsod ng Dasmariñas</p>
                  <p className="text-lg font-black text-blue-900 mt-4 uppercase">Tanggapan ng Punong Barangay</p>
                  <p className="text-xl font-black text-blue-800 uppercase">{formData.barangayName}</p>
                  <p className="text-[10px] text-neutral-400 mt-2 font-mono uppercase tracking-tighter">Reference No: {refNo}</p>
