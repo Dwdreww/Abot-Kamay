@@ -300,7 +300,7 @@ export default function BrgyCertForm() {
                  </p>
 
                  <p className="indent-12">
-                   At si <strong>{formData.claimantName || '__________________________'}</strong>, na <strong>{formData.relationship || '_________'}</strong> 
+                   At si <strong>{formData.claimantName || '__________________________'}</strong>, na <strong>{formData.relationship || '_________'}</strong>{' '}
                    ng nasabing pumanaw ay siyang humihiling ng application para sa <strong>Burial Assistance</strong> upang makatulong sa gastusin sa pagpapalibing.
                  </p>
 
