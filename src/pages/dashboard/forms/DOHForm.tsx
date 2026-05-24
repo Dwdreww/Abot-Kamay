@@ -107,6 +107,16 @@ export default function DOHForm() {
         timestamp: serverTimestamp()
       });
 
+      await addDoc(collection(db, 'notifications'), {
+        targetRole: 'admin_broadcast',
+        title: 'Bagong Aplikasyon',
+        message: `${user?.name || 'Isang user'} ay nagpasa ng DOH PRPWD form.`,
+        type: 'info',
+        isReadBy: [],
+        createdAt: serverTimestamp(),
+        link: 'tracking'
+      });
+
       setSubmitted(true);
     } catch (err) {
       console.error("Firestore Save Error:", err);

@@ -38,6 +38,7 @@ export const pdfCaptureColorFallbacks = `
   [data-pdf-capture] .border-neutral-200 { border-color: #e5e5e5 !important; }
   [data-pdf-capture] .border-neutral-100 { border-color: #f5f5f5 !important; }
   [data-pdf-capture] .border-slate-100 { border-color: #f1f5f9 !important; }
+  [data-pdf-capture] .border-slate-900 { border-color: #0f172a !important; }
   [data-pdf-capture] .border-blue-900 { border-color: #1e3a8a !important; }
   [data-pdf-capture] .decoration-slate-900\\/20 { text-decoration-color: rgba(15, 23, 42, 0.2) !important; }
 `;

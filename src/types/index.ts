@@ -90,10 +90,13 @@ export interface Announcement {
 
 export interface SystemNotification {
   id?: string;
-  userId: string;
+  userId?: string;
+  targetRole?: string;
   title: string;
   message: string;
   type: 'info' | 'success' | 'warning' | 'error';
-  isRead: boolean;
+  isRead?: boolean;
+  isReadBy?: string[];
   createdAt: any;
+  link?: string;
 }

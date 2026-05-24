@@ -74,6 +74,16 @@ export default function BrgyCertForm() {
         timestamp: serverTimestamp()
       });
 
+      await addDoc(collection(db, 'notifications'), {
+        targetRole: 'admin_broadcast',
+        title: 'Bagong Aplikasyon',
+        message: `${user?.name || 'Isang user'} ay nagpasa ng Barangay Certification form.`,
+        type: 'info',
+        isReadBy: [],
+        createdAt: serverTimestamp(),
+        link: 'tracking'
+      });
+
       setSubmitted(true);
     } catch (err) {
       console.error("Firestore Save Error:", err);
@@ -277,7 +287,7 @@ export default function BrgyCertForm() {
               {/* Header */}
               <div className="text-center border-b-2 border-double border-neutral-900 pb-8 mb-12">
                  <p className="text-sm font-bold uppercase tracking-widest text-neutral-800">Republika ng Pilipinas</p>
-                 <p className="text-sm text-neutral-600">Lalawigan ng Kabite</p>
+                 <p className="text-sm text-neutral-600">Lalawigan ng Cavite</p>
                  <p className="text-sm text-neutral-600">Lungsod ng Dasmariñas</p>
                  <p className="text-lg font-black text-blue-900 mt-4 uppercase">Tanggapan ng Punong Barangay</p>
                  <p className="text-xl font-black text-blue-800 uppercase">{formData.barangayName}</p>
@@ -294,14 +304,14 @@ export default function BrgyCertForm() {
                  <p className="font-bold">SA MGA KINAUUKULAN:</p>
                  
                  <p className="indent-12">
-                   Ito ay nagpapatunay na si <strong>{formData.deceasedName || '__________________________'}</strong>, 
-                   na naninirahan sa <strong>{formData.address || '____________________________________________________'}</strong> 
+                   Ito ay nagpapatunay na si <strong>{formData.deceasedName || '__________________________'}</strong>,{' '}
+                   na naninirahan sa{' '}<strong>{formData.address || '____________________________________________________'}</strong>{' '}
                    ay pumanaw na noong ika-<strong>{new Date(formData.date).toLocaleDateString('fil-PH', { month: 'long', day: 'numeric', year: 'numeric' })}</strong>.
                  </p>
 
                  <p className="indent-12">
-                   At si <strong>{formData.claimantName || '__________________________'}</strong>, na <strong>{formData.relationship || '_________'}</strong>{' '}
-                   ng nasabing pumanaw ay siyang humihiling ng application para sa <strong>Burial Assistance</strong> upang makatulong sa gastusin sa pagpapalibing.
+                   At si <strong>{formData.claimantName || '__________________________'}</strong>, na{' '}<strong>{formData.relationship || '_________'}</strong>{' '}
+                   ng nasabing pumanaw ay siyang humihiling ng application para sa{' '}<strong>Burial Assistance</strong> upang makatulong sa gastusin sa pagpapalibing.
                  </p>
 
                  <p className="indent-12">

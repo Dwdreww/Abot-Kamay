@@ -9,9 +9,9 @@ import {
 import { cn } from '../../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 import { initializeApp, deleteApp } from 'firebase/app';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import { collection, doc, onSnapshot, query, serverTimestamp, setDoc } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
+import { getAuth, createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
+import { collection, doc, onSnapshot, query, serverTimestamp, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { db, auth } from '../../lib/firebase';
 import firebaseConfig from '../../../firebase-applet-config.json';
 
 // ─── New User Modal ───────────────────────────────────────────────────────────
@@ -31,6 +31,7 @@ type ManagedUser = {
   lastLogin: string;
   permissions: string[];
   contactNumber?: string;
+  password?: string;
 };
 
 function roleLabel(role: string) {
@@ -126,6 +127,7 @@ function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
         birthdate: '',
         avatarUrl: '',
         status: 'active',
+        password: formData.password,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
@@ -368,6 +370,63 @@ export default function UserManagement() {
   const [systemUsers, setSystemUsers] = useState<ManagedUser[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [usersError, setUsersError] = useState<string | null>(null);
+  const [showUserPassword, setShowUserPassword] = useState(false);
+  const [resetModalUser, setResetModalUser] = useState<ManagedUser | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isResetting, setIsResetting] = useState(false);
+  const [resetError, setResetError] = useState('');
+  const [showResetPassword, setShowResetPassword] = useState(false);
+
+  const handleDeleteUser = async (userId: string) => {
+    if (!window.confirm("Gusto mo bang i-delete nang tuluyan ang user na ito? Ang aksyong ito ay hindi na mababawi.")) return;
+    try {
+      await deleteDoc(doc(db, 'users', userId));
+      setSelectedUser(null);
+      alert('Matagumpay na nai-delete ang user.');
+    } catch (e: any) {
+      alert(`May nangyaring error: ${e.message}`);
+    }
+  };
+
+  const handleResetPasswordClick = (user: ManagedUser) => {
+    setResetModalUser(user);
+    setNewPassword('');
+    setConfirmPassword('');
+    setResetError('');
+    setShowResetPassword(false);
+  };
+
+  const handleConfirmResetPassword = async () => {
+    if (!resetModalUser) return;
+    
+    if (newPassword !== confirmPassword) {
+      setResetError('Ang mga password ay hindi magkapareho.');
+      return;
+    }
+    
+    if (newPassword.length < 6) {
+      setResetError('Ang password ay dapat mayroong hindi bababa sa 6 na character.');
+      return;
+    }
+
+    setIsResetting(true);
+    setResetError('');
+    try {
+      // NOTE: Client SDK cannot directly change another user's password securely
+      // without Cloud Functions. We will update it in Firestore.
+      await updateDoc(doc(db, 'users', resetModalUser.id), {
+        password: newPassword,
+        updatedAt: serverTimestamp()
+      });
+      alert('Matagumpay na na-update ang password sa database.');
+      setResetModalUser(null);
+    } catch (e: any) {
+      setResetError(`May nangyaring error: ${e.message}`);
+    } finally {
+      setIsResetting(false);
+    }
+  };
 
   useEffect(() => {
     setLoadingUsers(true);
@@ -382,6 +441,7 @@ export default function UserManagement() {
               id: data.uid || userDoc.id,
               name: data.name || 'Walang pangalan',
               email: data.email || 'Walang email',
+              password: data.password || '',
               role: roleLabel(rawRole),
               rawRole,
               status: statusLabel(data.status),
@@ -391,6 +451,7 @@ export default function UserManagement() {
               createdAt: data.createdAt?.toMillis?.() || 0,
             };
           })
+          .filter((user) => user.rawRole !== 'member')
           .sort((a, b) => b.createdAt - a.createdAt)
           .map(({ createdAt, ...user }) => user);
 
@@ -409,7 +470,10 @@ export default function UserManagement() {
   }, []);
 
   useEffect(() => {
-    if (!selectedUser) return;
+    if (!selectedUser) {
+      setShowUserPassword(false);
+      return;
+    }
     const latestUser = systemUsers.find(user => user.id === selectedUser.id);
     if (latestUser) {
       setSelectedUser(latestUser);
@@ -459,13 +523,10 @@ export default function UserManagement() {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-6 gap-10">
+      <div className="w-full">
          {/* User List Table */}
-         <div className={cn(
-           "transition-all duration-500",
-           selectedUser ? "lg:col-span-3" : "lg:col-span-6"
-         )}>
-            <div className="bg-white rounded-[50px] border border-slate-100 shadow-2xl shadow-slate-200/40 overflow-hidden flex flex-col h-full">
+         <div className="w-full transition-all duration-500">
+            <div className="bg-white rounded-[40px] border border-slate-100 shadow-2xl shadow-slate-200/40 overflow-hidden flex flex-col h-full">
                <div className="p-10 border-b border-slate-50 bg-white">
                   <div className="flex items-center gap-4 relative">
                      <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300" />
@@ -484,15 +545,15 @@ export default function UserManagement() {
                      <thead className="bg-[#fcfdff]">
                         <tr>
                            <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Gumagamit</th>
-                           {!selectedUser && <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Itinalagang Papel</th>}
-                           {!selectedUser && <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Katayuan</th>}
+                           <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Itinalagang Papel</th>
+                           <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Katayuan</th>
                            <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Aksyon</th>
                         </tr>
                      </thead>
                      <tbody className="divide-y divide-slate-50">
                         {loadingUsers ? (
                           <tr>
-                            <td colSpan={selectedUser ? 2 : 4} className="px-10 py-16 text-center">
+                            <td colSpan={4} className="px-10 py-16 text-center">
                               <div className="flex flex-col items-center gap-3 text-slate-400">
                                 <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
                                 <span className="text-[10px] font-black uppercase tracking-widest">Nilo-load ang mga gumagamit...</span>
@@ -501,24 +562,20 @@ export default function UserManagement() {
                           </tr>
                         ) : usersError ? (
                           <tr>
-                            <td colSpan={selectedUser ? 2 : 4} className="px-10 py-16 text-center text-red-500 text-xs font-black uppercase tracking-widest">
+                            <td colSpan={4} className="px-10 py-16 text-center text-red-500 text-xs font-black uppercase tracking-widest">
                               {usersError}
                             </td>
                           </tr>
                         ) : filteredUsers.length === 0 ? (
                           <tr>
-                            <td colSpan={selectedUser ? 2 : 4} className="px-10 py-16 text-center text-slate-400 text-xs font-black uppercase tracking-widest">
+                            <td colSpan={4} className="px-10 py-16 text-center text-slate-400 text-xs font-black uppercase tracking-widest">
                               Walang gumagamit na tumutugma sa paghahanap.
                             </td>
                           </tr>
                         ) : filteredUsers.map((u) => (
                           <tr
                             key={u.id}
-                            onClick={() => setSelectedUser(u)}
-                            className={cn(
-                              "group transition-all cursor-pointer",
-                              selectedUser?.id === u.id ? "bg-blue-50/50" : "hover:bg-blue-50/30"
-                            )}
+                            className="group transition-all hover:bg-blue-50/30"
                           >
                              <td className="px-10 py-8">
                                 <div className="flex items-center gap-4">
@@ -531,30 +588,26 @@ export default function UserManagement() {
                                    </div>
                                 </div>
                              </td>
-                             {!selectedUser && (
-                               <td className="px-10 py-8">
-                                  <div className="flex items-center gap-2">
-                                     <Shield className={cn(
-                                       "w-4 h-4",
-                                       u.role === 'System Admin' ? "text-purple-600" : "text-blue-600"
-                                     )} />
-                                     <span className="text-[11px] font-black text-slate-700 uppercase tracking-widest">{u.role}</span>
-                                  </div>
-                               </td>
-                             )}
-                             {!selectedUser && (
-                               <td className="px-10 py-8">
-                                  <span className={cn(
-                                    "px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest shadow-sm",
-                                    u.status === 'Aktibo' ? "bg-emerald-100 text-emerald-600" : "bg-red-50 text-red-600 border border-red-100"
-                                  )}>
-                                     {u.status}
-                                  </span>
-                               </td>
-                             )}
                              <td className="px-10 py-8">
                                 <div className="flex items-center gap-2">
-                                   <button className="p-3 bg-white border border-slate-100 rounded-xl hover:shadow-xl hover:shadow-blue-200/50 transition-all">
+                                   <Shield className={cn(
+                                     "w-4 h-4",
+                                     u.role === 'System Admin' ? "text-purple-600" : "text-blue-600"
+                                   )} />
+                                   <span className="text-[11px] font-black text-slate-700 uppercase tracking-widest">{u.role}</span>
+                                </div>
+                             </td>
+                             <td className="px-10 py-8">
+                                <span className={cn(
+                                  "px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest shadow-sm",
+                                  u.status === 'Aktibo' ? "bg-emerald-100 text-emerald-600" : "bg-red-50 text-red-600 border border-red-100"
+                                )}>
+                                   {u.status}
+                                </span>
+                             </td>
+                             <td className="px-10 py-8">
+                                <div className="flex items-center gap-2">
+                                   <button onClick={() => setSelectedUser(u)} className="p-3 bg-white border border-slate-100 rounded-xl hover:shadow-xl hover:shadow-blue-200/50 hover:border-blue-100 transition-all group-hover:scale-110 cursor-pointer">
                                       <Settings className="w-4 h-4 text-slate-400 group-hover:text-blue-600" />
                                    </button>
                                 </div>
@@ -567,16 +620,19 @@ export default function UserManagement() {
             </div>
          </div>
 
-         {/* Security Profile Panel */}
+         {/* Security Profile Panel Modal */}
          <AnimatePresence>
             {selectedUser && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                className="lg:col-span-3 space-y-6"
-              >
-                 {/* Identity Card */}
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedUser(null)} />
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                  transition={{ duration: 0.2 }}
+                  className="relative w-full max-w-2xl max-h-[calc(100vh-2rem)] overflow-y-auto space-y-6 p-2 rounded-3xl"
+                >
+                   {/* Identity Card */}
                  <div className="bg-[#0b1a38] text-white p-10 rounded-[40px] shadow-2xl relative overflow-hidden">
                     <div className="relative z-10 flex items-start justify-between gap-6">
                        <div className="flex items-center gap-5">
@@ -654,6 +710,41 @@ export default function UserManagement() {
                              <p className="text-sm font-black text-slate-900 tracking-tight uppercase">Terminal 04 ng Barangay Hall</p>
                           </div>
                        </div>
+                       <div className="flex items-center gap-4 p-5 bg-slate-50 rounded-2xl border border-slate-100">
+                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center border border-slate-100 shrink-0">
+                             <Mail className="w-4 h-4 text-slate-400" />
+                          </div>
+                          <div className="overflow-hidden">
+                             <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Email Address</p>
+                             <p className="text-sm font-black text-slate-900 tracking-tight lowercase truncate">{selectedUser.email}</p>
+                          </div>
+                       </div>
+                       <div className="flex items-center justify-between p-5 bg-slate-50 rounded-2xl border border-slate-100">
+                          <div className="flex items-center gap-4">
+                             <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center border border-slate-100 shrink-0">
+                                <Lock className="w-4 h-4 text-slate-400" />
+                             </div>
+                             <div>
+                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Password</p>
+                                <p className="text-sm font-black text-slate-900 tracking-tight">
+                                  {showUserPassword 
+                                    ? (selectedUser.password || 'Walang nakatalang password') 
+                                    : '••••••••'}
+                                  <span className="text-[10px] text-slate-400 font-medium ml-2">
+                                    {selectedUser.password 
+                                      ? (showUserPassword ? '' : '(Nakatago para sa seguridad)')
+                                      : (showUserPassword ? '' : '(Hindi nakatala)')}
+                                  </span>
+                                </p>
+                             </div>
+                          </div>
+                          <button
+                            onClick={() => setShowUserPassword(!showUserPassword)}
+                            className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-200 text-slate-400 hover:text-slate-700 transition-colors shrink-0"
+                          >
+                            {showUserPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                          </button>
+                       </div>
                     </div>
                  </div>
 
@@ -661,11 +752,15 @@ export default function UserManagement() {
                  <div className="bg-white rounded-[40px] border border-slate-100 shadow-xl shadow-slate-200/40 p-8">
                     <div className="flex flex-wrap items-center justify-between gap-4">
                        <div className="flex gap-3">
-                          <button className="flex flex-col items-center justify-center gap-2 p-5 bg-slate-50 border border-slate-100 rounded-3xl group transition-all hover:bg-white hover:shadow-xl hover:shadow-blue-200/50 hover:border-blue-100 w-28">
+                          <button 
+                             onClick={() => selectedUser && handleResetPasswordClick(selectedUser)}
+                             className="flex flex-col items-center justify-center gap-2 p-5 bg-slate-50 border border-slate-100 rounded-3xl group transition-all hover:bg-white hover:shadow-xl hover:shadow-blue-200/50 hover:border-blue-100 w-28">
                              <Key className="w-5 h-5 text-slate-400 group-hover:text-blue-600 transition-colors" />
                              <span className="text-[8px] font-black text-slate-400 group-hover:text-slate-900 uppercase tracking-widest text-center leading-tight">I-reset ang Password</span>
                           </button>
-                          <button className="flex flex-col items-center justify-center gap-2 p-5 bg-slate-50 border border-slate-100 rounded-3xl group transition-all hover:bg-white hover:shadow-xl hover:shadow-red-200/50 hover:border-red-100 w-28">
+                          <button 
+                             onClick={() => selectedUser && handleDeleteUser(selectedUser.id)}
+                             className="flex flex-col items-center justify-center gap-2 p-5 bg-slate-50 border border-slate-100 rounded-3xl group transition-all hover:bg-white hover:shadow-xl hover:shadow-red-200/50 hover:border-red-100 w-28">
                              <Trash2 className="w-5 h-5 text-slate-400 group-hover:text-red-600 transition-colors" />
                              <span className="text-[8px] font-black text-slate-400 group-hover:text-slate-900 uppercase tracking-widest text-center leading-tight">Delete</span>
                           </button>
@@ -684,9 +779,120 @@ export default function UserManagement() {
                     </div>
                  </div>
               </motion.div>
+              </div>
             )}
          </AnimatePresence>
       </div>
+
+      {/* Password Reset Modal */}
+      <AnimatePresence>
+        {resetModalUser && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setResetModalUser(null)}
+              className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-md bg-white rounded-[40px] shadow-2xl overflow-hidden flex flex-col"
+            >
+              <div className="p-8">
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center">
+                      <Key className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-black text-slate-900 tracking-tight">Reset Password</h2>
+                      <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">
+                        Para kay {resetModalUser.name}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setResetModalUser(null)}
+                    className="w-10 h-10 flex items-center justify-center bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-full transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
+                      Bagong Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showResetPassword ? "text" : "password"}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="Ilagay ang bagong password"
+                        className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-medium focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none pr-12"
+                      />
+                      <button
+                        onClick={() => setShowResetPassword(!showResetPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                      >
+                        {showResetPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
+                      I-confirm ang Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showResetPassword ? "text" : "password"}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="I-type muli ang bagong password"
+                        className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-medium focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none pr-12"
+                      />
+                      <button
+                        onClick={() => setShowResetPassword(!showResetPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                      >
+                        {showResetPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {resetError && (
+                    <div className="p-4 bg-red-50 text-red-600 rounded-2xl text-xs font-bold border border-red-100">
+                      {resetError}
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-8 flex gap-3">
+                  <button
+                    onClick={() => setResetModalUser(null)}
+                    className="flex-1 py-4 bg-slate-100 text-slate-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-200 transition-colors"
+                  >
+                    Kanselahin
+                  </button>
+                  <button
+                    onClick={handleConfirmResetPassword}
+                    disabled={isResetting || !newPassword || !confirmPassword}
+                    className="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-blue-500/30"
+                  >
+                    {isResetting && <Loader2 className="w-4 h-4 animate-spin" />}
+                    I-save
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

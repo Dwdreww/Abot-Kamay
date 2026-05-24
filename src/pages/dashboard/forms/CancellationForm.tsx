@@ -79,6 +79,16 @@ export default function CancellationForm() {
         timestamp: serverTimestamp()
       });
 
+      await addDoc(collection(db, 'notifications'), {
+        targetRole: 'admin_broadcast',
+        title: 'Bagong Aplikasyon',
+        message: `${user?.name || 'Isang user'} ay nagpasa ng Membership Cancellation form.`,
+        type: 'info',
+        isReadBy: [],
+        createdAt: serverTimestamp(),
+        link: 'tracking'
+      });
+
       setSubmitted(true);
     } catch (err) {
       console.error("Firestore Save Error:", err);
@@ -103,22 +113,22 @@ export default function CancellationForm() {
       });
       const pageW = 215.9;
       const pageH = 279.4;
+      const margin = 14;
+      const contentW = pageW - margin * 2;
+      const contentH = pageH - margin * 2;
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [pageW, pageH] });
-      const imgW = pageW;
-      const pageHeightPx = Math.floor((canvas.width * pageH) / pageW);
-      let offset = 0;
-      let firstPage = true;
-      while (offset < canvas.height) {
-        if (!firstPage) pdf.addPage();
-        firstPage = false;
-        const slice = document.createElement('canvas');
-        slice.width = canvas.width;
-        slice.height = Math.min(pageHeightPx, canvas.height - offset);
-        slice.getContext('2d')!.drawImage(canvas, 0, -offset);
-        const sliceH = (slice.height * imgW) / canvas.width;
-        pdf.addImage(slice.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, imgW, sliceH);
-        offset += pageHeightPx;
+      
+      let imgW = contentW;
+      let imgH = (canvas.height / canvas.width) * imgW;
+      
+      if (imgH > contentH) {
+         const scale = contentH / imgH;
+         imgW = imgW * scale;
+         imgH = imgH * scale;
       }
+      
+      const xOffset = margin + (contentW - imgW) / 2;
+      pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', xOffset, margin, imgW, imgH);
       const blob = pdf.output('blob');
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -360,71 +370,72 @@ export default function CancellationForm() {
            </div>
 
            {/* Cancellation Certificate Preview */}
-           <div ref={previewRef} data-pdf-capture className="bg-white p-16 md:p-24 shadow-2xl rounded-sm border-t-[12px] border-blue-900 max-w-[850px] mx-auto min-h-[1100px] flex flex-col relative overflow-hidden">
-              {/* Watermark/Seal background */}
-              <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none">
-                 <div className="w-[600px] h-[600px] border-[40px] border-blue-900 rounded-full flex items-center justify-center">
-                    <span className="text-8xl font-black text-blue-900 text-center uppercase tracking-tighter">TANGGAPAN<br/>NG PWD</span>
+           <div className="w-full overflow-x-auto pb-8">
+              <div ref={previewRef} data-pdf-capture className="bg-white p-12 md:p-16 shadow-2xl rounded-sm border-t-[12px] border-blue-900 w-[816px] min-h-[1056px] shrink-0 mx-auto flex flex-col relative overflow-hidden">
+                 {/* Watermark/Seal background */}
+                 <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none">
+                    <div className="w-[600px] h-[600px] border-[40px] border-blue-900 rounded-full flex items-center justify-center">
+                       <span className="text-8xl font-black text-blue-900 text-center uppercase tracking-tighter">TANGGAPAN<br/>NG PWD</span>
+                    </div>
                  </div>
-              </div>
 
               {/* Header */}
-              <div className="text-center space-y-1 mb-14 relative z-10">
+              <div className="text-center space-y-1 mb-10 relative z-10">
                  <p className="text-sm font-bold uppercase tracking-widest text-slate-800">Republika ng Pilipinas</p>
                  <p className="text-sm text-slate-600 uppercase font-medium">Lalawigan ng {formData.province}</p>
                  <p className="text-sm text-slate-600 uppercase font-medium">Lungsod ng {formData.city}</p>
                  <p className="text-sm text-slate-800 uppercase font-black tracking-tight underline">Barangay {formData.barangay}</p>
-                 <p className="text-lg font-black text-blue-900 mt-6 uppercase tracking-tight">Tanggapan ng Persons with Disability (PWD)</p>
+                 <p className="text-lg font-black text-blue-900 mt-4 uppercase tracking-tight">Tanggapan ng Persons with Disability (PWD)</p>
                  <div className="w-24 h-1 bg-blue-900 mx-auto mt-4 rounded-full"></div>
               </div>
 
               {/* Title */}
-              <div className="text-center mb-16 relative z-10">
+              <div className="text-center mb-10 relative z-10">
                  <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tighter decoration-slate-900/20 underline underline-offset-8">SERTIPIKO NG PAGKANSELA NG PWD MEMBERSHIP</h1>
               </div>
 
               {/* Body */}
-              <div className="flex-grow space-y-10 text-base font-medium leading-relaxed text-slate-800 relative z-10 text-justify">
+              <div className="flex-grow space-y-6 text-base font-medium leading-relaxed text-slate-800 relative z-10 text-justify">
                  <p className="font-black text-slate-900">SA KINAUUKULAN:</p>
                  
                  <p className="indent-12">
-                   Ito ay nagpapatunay na si <strong className="text-slate-900 px-1 border-b border-slate-300">{formData.fullName || '__________________________'}</strong>, 
-                   na naninirahan sa <strong className="text-slate-900 px-1 border-b border-slate-300">{formData.address || '____________________________________________________'}</strong>, 
-                   ay dating nakarehistro bilang miyembro ng Barangay Persons with Disability (PWD) Registry sa ilalim ng PWD ID No. <strong className="text-slate-900 font-mono px-1 border-b border-slate-300">{formData.pwdId || '[ID NUMBER]'}</strong>.
+                   Ito ay nagpapatunay na si <strong className="text-slate-900 px-1 border-b border-slate-300">{formData.fullName || '__________________________'}</strong>,{' '}
+                   na naninirahan sa{' '}<strong className="text-slate-900 px-1 border-b border-slate-300">{formData.address || '____________________________________________________'}</strong>,{' '}
+                   ay dating nakarehistro bilang miyembro ng Barangay Persons with Disability (PWD) Registry sa ilalim ng PWD ID No.{' '}<strong className="text-slate-900 font-mono px-1 border-b border-slate-300">{formData.pwdId || '[ID NUMBER]'}</strong>.
                  </p>
 
                  <p className="indent-12">
                    Batay sa kahilingan at matapos ang pagsusuri, ang nasabing membership ay kinansela simula <strong className="text-slate-900 px-1 border-b border-slate-300">{processedDate.toLocaleDateString('fil-PH', { month: 'long', day: 'numeric', year: 'numeric' })}</strong>, dahil sa sumusunod na dahilan:
                  </p>
 
-                 <div className="space-y-4 pl-12">
+                 <div className="space-y-3 pl-12">
                     <div className="flex items-start gap-4">
-                       <div className="w-5 h-5 border-2 border-slate-900 shrink-0 mt-1 flex items-center justify-center">
-                          {formData.reasons.transfer && <div className="w-3 h-3 bg-slate-900"></div>}
+                       <div className="w-5 h-5 border-2 border-slate-900 shrink-0 mt-1 flex items-center justify-center font-black text-slate-900 text-lg leading-none">
+                          {formData.reasons.transfer && '✓'}
                        </div>
                        <p className="text-sm font-bold uppercase tracking-tight">Paglipat ng tirahan sa ibang barangay/lungsod/munisipalidad</p>
                     </div>
                     <div className="flex items-start gap-4">
-                       <div className="w-5 h-5 border-2 border-slate-900 shrink-0 mt-1 flex items-center justify-center">
-                          {formData.reasons.voluntary && <div className="w-3 h-3 bg-slate-900"></div>}
+                       <div className="w-5 h-5 border-2 border-slate-900 shrink-0 mt-1 flex items-center justify-center font-black text-slate-900 text-lg leading-none">
+                          {formData.reasons.voluntary && '✓'}
                        </div>
                        <p className="text-sm font-bold uppercase tracking-tight">Kusang pag-alis sa PWD Registry</p>
                     </div>
                     <div className="flex items-start gap-4">
-                       <div className="w-5 h-5 border-2 border-slate-900 shrink-0 mt-1 flex items-center justify-center">
-                          {formData.reasons.reclassification && <div className="w-3 h-3 bg-slate-900"></div>}
+                       <div className="w-5 h-5 border-2 border-slate-900 shrink-0 mt-1 flex items-center justify-center font-black text-slate-900 text-lg leading-none">
+                          {formData.reasons.reclassification && '✓'}
                        </div>
                        <p className="text-sm font-bold uppercase tracking-tight">Reclassification o pagbabago ng disability status</p>
                     </div>
                     <div className="flex items-start gap-4">
-                       <div className="w-5 h-5 border-2 border-slate-900 shrink-0 mt-1 flex items-center justify-center">
-                          {formData.reasons.other && <div className="w-3 h-3 bg-slate-900"></div>}
+                       <div className="w-5 h-5 border-2 border-slate-900 shrink-0 mt-1 flex items-center justify-center font-black text-slate-900 text-lg leading-none">
+                          {formData.reasons.other && '✓'}
                        </div>
                        <p className="text-sm font-bold uppercase tracking-tight">Iba pa: <span className="border-b border-slate-300 px-2">{formData.otherReason || '_______________________'}</span></p>
                     </div>
                  </div>
 
-                 <p className="indent-12 mt-12">
+                 <p className="indent-12 mt-8">
                    Ang sertipikong ito ay ibinibigay sa kahilingan ng kinauukulang indibidwal para sa anumang legal o administratibong layunin.
                  </p>
 
@@ -434,8 +445,8 @@ export default function CancellationForm() {
               </div>
 
               {/* Signatures */}
-              <div className="mt-24 space-y-1 relative z-10">
-                 <div className="w-72 border-b border-slate-900 pt-16"></div>
+              <div className="mt-16 space-y-1 relative z-10">
+                 <div className="w-72 border-b border-slate-900 pt-10"></div>
                  <p className="text-sm font-black uppercase text-slate-900 tracking-tight">{formData.presidentName}</p>
                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Presidente ng Barangay PWD</p>
                  <div className="pt-4 space-y-1">
@@ -445,7 +456,7 @@ export default function CancellationForm() {
               </div>
 
               {/* Reference Footer */}
-              <div className="mt-auto pt-16 flex items-end justify-between relative z-10">
+              <div className="mt-auto pt-10 flex items-end justify-between relative z-10">
                  <div className="space-y-1">
                     <p className="text-[9px] font-mono text-slate-300 uppercase">Rekord na Binuo ng Sistema</p>
                     <p className="text-[9px] font-mono text-slate-400 uppercase tracking-tighter">REF: {refNo}</p>
@@ -455,7 +466,8 @@ export default function CancellationForm() {
                  </div>
               </div>
            </div>
-        </div>
+         </div>
+         </div>
       )}
     </div>
   );

@@ -221,24 +221,27 @@ export default function PWDProfiles() {
                            <div className="flex items-center justify-end gap-2 transition-opacity">
                               <button 
                                 onClick={() => { setSelectedProfile(member); setIsViewModalOpen(true); }}
-                                className="p-2.5 bg-white border border-slate-100 rounded-xl text-slate-400 hover:text-blue-600 hover:border-blue-100 hover:shadow-lg transition-all" 
-                                title="View Profile"
+                                className="flex items-center gap-1.5 px-3 py-2.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-xl text-[10px] font-black uppercase tracking-wider hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all min-h-[38px] whitespace-nowrap" 
+                                title="Tingnan ang Profile"
                               >
-                                 <Eye className="w-4 h-4" />
+                                 <Eye className="w-3.5 h-3.5 shrink-0" />
+                                 <span>Tingnan</span>
                               </button>
                               <button 
                                 onClick={() => { setSelectedProfile(member); setIsFormModalOpen(true); }}
-                                className="p-2.5 bg-white border border-slate-100 rounded-xl text-slate-400 hover:text-blue-600 hover:border-blue-100 hover:shadow-lg transition-all" 
-                                title="Edit Record"
+                                className="flex items-center gap-1.5 px-3 py-2.5 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-xl text-[10px] font-black uppercase tracking-wider hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all min-h-[38px] whitespace-nowrap" 
+                                title="I-edit ang Rekord"
                               >
-                                 <Edit2 className="w-4 h-4" />
+                                 <Edit2 className="w-3.5 h-3.5 shrink-0" />
+                                 <span>I-edit</span>
                               </button>
                               <button 
                                 onClick={() => handleDelete(member.id!, `${member.firstName} ${member.lastName}`)}
-                                className="p-2.5 bg-white border border-slate-100 rounded-xl text-slate-400 hover:text-red-600 hover:border-red-100 hover:shadow-lg transition-all" 
-                                title="Delete record"
+                                className="flex items-center gap-1.5 px-3 py-2.5 bg-red-50 text-red-600 border border-red-100 rounded-xl text-[10px] font-black uppercase tracking-wider hover:bg-red-600 hover:text-white hover:border-red-600 transition-all min-h-[38px] whitespace-nowrap" 
+                                title="Burahin ang Rekord"
                               >
-                                 <Trash2 className="w-4 h-4" />
+                                 <Trash2 className="w-3.5 h-3.5 shrink-0" />
+                                 <span>Burahin</span>
                               </button>
                            </div>
                         </td>

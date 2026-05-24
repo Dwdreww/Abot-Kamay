@@ -164,9 +164,13 @@ function DOHPRPWDPreview({ data }: { data: any }) {
 
         {/* Right Side: Solid Photo Box Column spanning all 3 rows */}
         <div style={{ width: 110, borderLeft: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 6, background: '#fdfdfd' }}>
-          <div style={{ border: '1px solid #333', width: '100%', height: '100%', minHeight: 85, display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', fontSize: 9, fontWeight: 'bold', color: '#333', lineHeight: 1.3 }}>
-            Place 2x2<br />Photo
-          </div>
+          {fd.photoUrl ? (
+            <img src={fd.photoUrl} alt="Photo" style={{ width: '100%', height: '100%', minHeight: 85, objectFit: 'cover' }} />
+          ) : (
+            <div style={{ border: '1px solid #333', width: '100%', height: '100%', minHeight: 85, display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', fontSize: 9, fontWeight: 'bold', color: '#333', lineHeight: 1.3 }}>
+              Place 2x2<br />Photo
+            </div>
+          )}
         </div>
       </div>
 
@@ -175,21 +179,33 @@ function DOHPRPWDPreview({ data }: { data: any }) {
         <Cell style={{ flex: 1, borderRight: '1px solid #333' }}>
           <Label>4. TYPE OF DISABILITY: (Check all that apply)*</Label>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1px 4px', marginTop: 2 }}>
-            {disabilityTypes.map(d => (
-              <div key={d} style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 9 }}>
-                <CB checked={selectedDisabilities.includes(d)} />{d}
-              </div>
-            ))}
+            {disabilityTypes.map(d => {
+              const isChecked = selectedDisabilities.some(sel => d.includes(sel) || (d === 'Psychosocial Disability' && sel === 'Psychological'));
+              return (
+                <div key={d} style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 9 }}>
+                  <CB checked={isChecked} />{d}
+                </div>
+              );
+            })}
           </div>
         </Cell>
         <Cell style={{ flex: 1 }}>
           <Label>5. CAUSE OF DISABILITY:*</Label>
-          {[['Congenital/Inborn', 'Acquired'], ['Autism', 'Chronic'], ['ADHD', 'Cerebral Injury'], ['Cerebral Palsy', ''], ['Down Syndrome', '']].map(([a, b]) => (
-            <div key={a} style={{ display: 'flex', gap: 8, fontSize: 9, marginTop: 2 }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 2 }}><CB checked={fd.disabilityCause === a} />{a}</span>
-              {b && <span style={{ display: 'flex', alignItems: 'center', gap: 2 }}><CB checked={fd.disabilityCause === b} />{b}</span>}
-            </div>
-          ))}
+          {[['Congenital/Inborn', 'Acquired'], ['Autism', 'Chronic'], ['ADHD', 'Cerebral Injury'], ['Cerebral Palsy', ''], ['Down Syndrome', '']].map(([a, b]) => {
+            const checkCause = (val: string) => {
+              if (val === 'Congenital/Inborn') return fd.disabilityCauseCategory === 'Congenital';
+              if (val === 'Acquired') return fd.disabilityCauseCategory === 'Acquired';
+              if (val === 'Chronic') return fd.disabilityCauseSub === 'Chronical' || fd.disabilityCauseSub === 'Chronic';
+              if (val === 'Cerebral Injury') return fd.disabilityCauseSub === 'Cerebral' || fd.disabilityCauseSub === 'Injury' || fd.disabilityCauseSub === 'Cerebral Injury';
+              return fd.disabilityCauseSub === val;
+            };
+            return (
+              <div key={a} style={{ display: 'flex', gap: 8, fontSize: 9, marginTop: 2 }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 2 }}><CB checked={checkCause(a)} />{a}</span>
+                {b && <span style={{ display: 'flex', alignItems: 'center', gap: 2 }}><CB checked={checkCause(b)} />{b}</span>}
+              </div>
+            );
+          })}
         </Cell>
       </Row>
 
@@ -372,24 +388,109 @@ function BrgyCertPreview({ data }: { data: any }) {
 
 function CancellationPreview({ data }: { data: any }) {
   const fd = data.formData || {};
+  const refNo = data.referenceNumber || 'N/A';
+  
+  const processedDate = new Date(fd.effectiveDate || new Date());
+  processedDate.setDate(processedDate.getDate() + 1);
+
+  const reasons = fd.reasons || {};
+
   return (
-    <>
-      <div className="text-center mb-8">
-        <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Republika ng Pilipinas</p>
-        <h2 className="text-lg font-black text-neutral-900 uppercase tracking-wide mt-2">Sertipiko ng Pagkansela</h2>
-        <h3 className="text-[12px] font-bold text-neutral-600">Form ng Pagkansela ng PWD Membership</h3>
-        <p className="text-[10px] font-mono mt-2 text-neutral-400">Ref No: {data.referenceNumber}</p>
+    <div className="flex flex-col relative overflow-hidden pt-8">
+      {/* Watermark/Seal background */}
+      <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none">
+         <div className="w-[600px] h-[600px] border-[40px] border-blue-900 rounded-full flex items-center justify-center">
+            <span className="text-8xl font-black text-blue-900 text-center uppercase tracking-tighter">TANGGAPAN<br/>NG PWD</span>
+         </div>
       </div>
-      <SectionTitle>Impormasyon ng Miyembro</SectionTitle>
-      <div className="space-y-1">
-        <Field label="Buong Pangalan"  value={data.applicantName} />
-        <Field label="Tirahan"         value={data.address} />
-        <Field label="Contact No."     value={data.contactNumber} />
-        <Field label="Email"           value={data.applicantEmail} />
-        <Field label="Dahilan"         value={fd.reason} />
+
+      {/* Header */}
+      <div className="text-center space-y-1 mb-10 relative z-10">
+         <p className="text-sm font-bold uppercase tracking-widest text-slate-800">Republika ng Pilipinas</p>
+         <p className="text-sm text-slate-600 uppercase font-medium">Lalawigan ng {fd.province || 'Cavite'}</p>
+         <p className="text-sm text-slate-600 uppercase font-medium">Lungsod ng {fd.city || 'Dasmariñas'}</p>
+         <p className="text-sm text-slate-800 uppercase font-black tracking-tight underline">Barangay {fd.barangay || 'San Antonio de Padua I'}</p>
+         <p className="text-lg font-black text-blue-900 mt-4 uppercase tracking-tight">Tanggapan ng Persons with Disability (PWD)</p>
+         <div className="w-24 h-1 bg-blue-900 mx-auto mt-4 rounded-full"></div>
       </div>
-      <SignatureBlock submittedAt={data.submittedAt} />
-    </>
+
+      {/* Title */}
+      <div className="text-center mb-10 relative z-10">
+         <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tighter decoration-slate-900/20 underline underline-offset-8">SERTIPIKO NG PAGKANSELA NG PWD MEMBERSHIP</h1>
+      </div>
+
+      {/* Body */}
+      <div className="flex-grow space-y-6 text-base font-medium leading-relaxed text-slate-800 relative z-10 text-justify">
+         <p className="font-black text-slate-900">SA KINAUUKULAN:</p>
+         
+         <p className="indent-12">
+           Ito ay nagpapatunay na si <strong className="text-slate-900 px-1 border-b border-slate-300">{fd.fullName || data.applicantName || '__________________________'}</strong>,{' '}
+           na naninirahan sa{' '}<strong className="text-slate-900 px-1 border-b border-slate-300">{fd.address || data.address || '____________________________________________________'}</strong>,{' '}
+           ay dating nakarehistro bilang miyembro ng Barangay Persons with Disability (PWD) Registry sa ilalim ng PWD ID No.{' '}<strong className="text-slate-900 font-mono px-1 border-b border-slate-300">{fd.pwdId || '[ID NUMBER]'}</strong>.
+         </p>
+
+         <p className="indent-12">
+           Batay sa kahilingan at matapos ang pagsusuri, ang nasabing membership ay kinansela simula <strong className="text-slate-900 px-1 border-b border-slate-300">{processedDate.toLocaleDateString('fil-PH', { month: 'long', day: 'numeric', year: 'numeric' })}</strong>, dahil sa sumusunod na dahilan:
+         </p>
+
+         <div className="space-y-3 pl-12">
+            <div className="flex items-start gap-4">
+               <div className="w-5 h-5 border-2 border-slate-900 shrink-0 mt-1 flex items-center justify-center font-black text-slate-900 text-lg leading-none">
+                  {reasons.transfer && '✓'}
+               </div>
+               <p className="text-sm font-bold uppercase tracking-tight">Paglipat ng tirahan sa ibang barangay/lungsod/munisipalidad</p>
+            </div>
+            <div className="flex items-start gap-4">
+               <div className="w-5 h-5 border-2 border-slate-900 shrink-0 mt-1 flex items-center justify-center font-black text-slate-900 text-lg leading-none">
+                  {reasons.voluntary && '✓'}
+               </div>
+               <p className="text-sm font-bold uppercase tracking-tight">Kusang pag-alis sa PWD Registry</p>
+            </div>
+            <div className="flex items-start gap-4">
+               <div className="w-5 h-5 border-2 border-slate-900 shrink-0 mt-1 flex items-center justify-center font-black text-slate-900 text-lg leading-none">
+                  {reasons.reclassification && '✓'}
+               </div>
+               <p className="text-sm font-bold uppercase tracking-tight">Reclassification o pagbabago ng disability status</p>
+            </div>
+            <div className="flex items-start gap-4">
+               <div className="w-5 h-5 border-2 border-slate-900 shrink-0 mt-1 flex items-center justify-center font-black text-slate-900 text-lg leading-none">
+                  {reasons.other && '✓'}
+               </div>
+               <p className="text-sm font-bold uppercase tracking-tight">Iba pa: <span className="border-b border-slate-300 px-2">{fd.otherReason || '_______________________'}</span></p>
+            </div>
+         </div>
+
+         <p className="indent-12 mt-8">
+           Ang sertipikong ito ay ibinibigay sa kahilingan ng kinauukulang indibidwal para sa anumang legal o administratibong layunin.
+         </p>
+
+         <p className="indent-12">
+           Ipinagkaloob ngayong ika-<strong className="text-slate-900">{processedDate.getDate()}</strong> ng <strong className="text-slate-900">{processedDate.toLocaleString('fil-PH', { month: 'long' })}</strong>, <strong className="text-slate-900">{processedDate.getFullYear()}</strong> sa Barangay <strong className="text-slate-900">{fd.barangay || 'San Antonio de Padua I'}</strong>, <strong className="text-slate-900">{fd.city || 'Dasmariñas'}</strong>, <strong className="text-slate-900">{fd.province || 'Cavite'}</strong>, Pilipinas.
+         </p>
+      </div>
+
+      {/* Signatures */}
+      <div className="mt-16 space-y-1 relative z-10">
+         <div className="w-72 border-b border-slate-900 pt-10"></div>
+         <p className="text-sm font-black uppercase text-slate-900 tracking-tight">{fd.presidentName || 'Hon. Roberto M. Reyes'}</p>
+         <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Presidente ng Barangay PWD</p>
+         <div className="pt-4 space-y-1">
+            <p className="text-[10px] font-medium text-slate-400 capitalize">Numero sa Telepono: {fd.contactNo || data.contactNumber || '0917-888-1234'}</p>
+            <p className="text-[10px] font-medium text-slate-400 capitalize">Email: {fd.email || data.applicantEmail || 'pwd@dasmariñas.gov.ph'}</p>
+         </div>
+      </div>
+
+      {/* Reference Footer */}
+      <div className="mt-auto pt-10 flex items-end justify-between relative z-10">
+         <div className="space-y-1">
+            <p className="text-[9px] font-mono text-slate-300 uppercase">Rekord na Binuo ng Sistema</p>
+            <p className="text-[9px] font-mono text-slate-400 uppercase tracking-tighter">REF: {refNo}</p>
+         </div>
+         <div className="w-32 h-32 border-4 border-slate-100 rounded-full flex items-center justify-center opacity-40">
+            <p className="text-[9px] font-black text-slate-300 text-center uppercase tracking-widest leading-none">Opisyal na<br/>Selyo ng<br/>Barangay PWD</p>
+         </div>
+      </div>
+    </div>
   );
 }
 
@@ -487,12 +588,21 @@ export default function DocumentViewerModal({
       });
 
       const imgData = canvas.toDataURL('image/jpeg', 0.95);
-      const imgW = CONTENT_W_MM;
-      const imgH = (canvas.height / canvas.width) * imgW;
+      let imgW = CONTENT_W_MM;
+      let imgH = (canvas.height / canvas.width) * imgW;
+
+      const ft = appData?.formType || collectionName;
+      const isCertificate = ft === 'cancellation_certificate' || ft === 'burial_assistance_certificate' || ft === 'membership_cancellation' || ft === 'brgy_certification';
+
+      if (isCertificate && imgH > CONTENT_H_MM) {
+         const scale = CONTENT_H_MM / imgH;
+         imgW = imgW * scale;
+         imgH = imgH * scale;
+      }
 
       if (imgH <= CONTENT_H_MM) {
         // Single page — fits perfectly
-        pdf.addImage(imgData, 'JPEG', MARGIN_MM, MARGIN_MM, imgW, imgH);
+        pdf.addImage(imgData, 'JPEG', MARGIN_MM + (CONTENT_W_MM - imgW) / 2, MARGIN_MM, imgW, imgH);
       } else {
         // Multi-page: slice canvas row-by-row per page
         const pxPerMm = canvas.width / imgW;
@@ -698,19 +808,25 @@ export default function DocumentViewerModal({
               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Kinukuha ang dokumento...</p>
             </div>
           ) : error ? (
-            <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
-              <AlertCircle className="w-10 h-10 text-red-400" />
-              <p className="text-sm font-bold text-slate-600">{error}</p>
+            <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">
+              <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center">
+                <AlertCircle className="w-8 h-8" />
+              </div>
+              <div>
+                <p className="text-sm font-black text-slate-900 uppercase tracking-tight">May Problema</p>
+                <p className="text-xs text-slate-500 font-medium">{error}</p>
+              </div>
             </div>
           ) : (
-            /* White paper preview */
-            <div
-              ref={printRef}
-              data-pdf-capture
-              className="bg-white rounded-2xl shadow-xl p-10 border border-slate-100 min-h-[600px]"
-              style={{ fontFamily: 'Arial, sans-serif' }}
-            >
-              {renderPreview()}
+            <div className="w-full overflow-x-auto pb-8">
+              <div
+                ref={printRef}
+                data-pdf-capture
+                className="bg-white shadow-xl p-12 border border-slate-100 w-[816px] min-h-[1056px] shrink-0 mx-auto relative"
+                style={{ fontFamily: 'Arial, sans-serif' }}
+              >
+                {renderPreview()}
+              </div>
             </div>
           )}
         </div>

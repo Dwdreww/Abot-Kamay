@@ -37,31 +37,68 @@ export default function Dashboard() {
     setActiveView(view);
   };
   const [notifications, setNotifications] = useState<SystemNotification[]>([]);
+  const [personalNotifs, setPersonalNotifs] = useState<SystemNotification[]>([]);
+  const [broadcastNotifs, setBroadcastNotifs] = useState<SystemNotification[]>([]);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   useEffect(() => {
     if (!user?.uid) return;
-    const q = query(
+    
+    // Personal Notifications
+    const q1 = query(
       collection(db, 'notifications'),
       where('userId', '==', user.uid),
       orderBy('createdAt', 'desc')
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsub1 = onSnapshot(q1, (snapshot) => {
       const notifs: SystemNotification[] = [];
       snapshot.forEach((doc) => {
         notifs.push({ id: doc.id, ...doc.data() } as SystemNotification);
       });
-      setNotifications(notifs);
+      setPersonalNotifs(notifs);
     });
+    
+    // Broadcast Notifications (Admins & Staff only)
+    let unsub2 = () => {};
+    if (user.role === 'admin' || user.role === 'staff') {
+       const q2 = query(
+         collection(db, 'notifications'),
+         where('targetRole', '==', 'admin_broadcast'),
+         orderBy('createdAt', 'desc')
+       );
+       unsub2 = onSnapshot(q2, (snapshot) => {
+         const notifs: SystemNotification[] = [];
+         snapshot.forEach((doc) => {
+           notifs.push({ id: doc.id, ...doc.data() } as SystemNotification);
+         });
+         setBroadcastNotifs(notifs);
+       });
+    }
 
-    return () => unsubscribe();
+    return () => { unsub1(); unsub2(); };
   }, [user]);
 
-  const handleReadNotif = async (notifId: string) => {
+  useEffect(() => {
+     const combined = [...personalNotifs, ...broadcastNotifs]
+        .map(n => ({
+           ...n,
+           isRead: n.targetRole === 'admin_broadcast' ? n.isReadBy?.includes(user?.uid || '') : n.isRead
+        }))
+        .sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
+     setNotifications(combined);
+  }, [personalNotifs, broadcastNotifs, user?.uid]);
+
+  const handleReadNotif = async (notif: SystemNotification) => {
     try {
-      await updateDoc(doc(db, 'notifications', notifId), { isRead: true });
+      if (notif.targetRole === 'admin_broadcast') {
+         await updateDoc(doc(db, 'notifications', notif.id!), { 
+           isReadBy: arrayUnion(user?.uid) 
+         });
+      } else {
+         await updateDoc(doc(db, 'notifications', notif.id!), { isRead: true });
+      }
     } catch (e) {
       console.error(e);
     }
@@ -138,12 +175,24 @@ export default function Dashboard() {
         )}
       >
         {/* Logo Section */}
-        <div className="p-8 flex items-center gap-3">
-          <img src="/logoAbotKamay.png" alt="Logo" className="w-10 h-10 object-contain rounded-xl" />
+        <div className="p-8 flex items-start gap-3">
+          <img src="/logoAbotKamay.png" alt="Logo" className="w-10 h-10 object-contain rounded-xl -mt-1" />
           {isSidebarOpen && (
             <div className="flex flex-col">
               <h1 className="text-lg font-black leading-none uppercase tracking-tight">Abot-Kamay</h1>
               <p className="text-[8px] text-white/70 font-bold uppercase tracking-widest mt-1">Barangay PWD Platform</p>
+              {user?.role !== 'member' && (
+                <div className="mt-2">
+                  <span className={cn(
+                    "px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest border inline-block",
+                    (user?.role === 'admin' || user?.role === 'system_admin')
+                      ? "bg-purple-500/20 text-purple-300 border-purple-500/30"
+                      : "bg-blue-500/20 text-blue-300 border-blue-500/30"
+                  )}>
+                    {(user?.role === 'admin' || user?.role === 'system_admin') ? 'System Admin' : 'Barangay Staff'}
+                  </span>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -297,7 +346,12 @@ export default function Dashboard() {
                     notifications.map(n => (
                       <button 
                         key={n.id}
-                        onClick={() => { if(!n.isRead) handleReadNotif(n.id!); setIsNotifOpen(false); if(user?.role === 'member') navigateTo('tracking'); }}
+                        onClick={() => { 
+                          if(!n.isRead) handleReadNotif(n); 
+                          setIsNotifOpen(false); 
+                          if(n.link) navigateTo(n.link as any);
+                          else if(user?.role === 'member') navigateTo('tracking'); 
+                        }}
                         className={cn("w-full text-left p-4 border-b border-slate-50 hover:bg-slate-50 transition-colors", !n.isRead && "bg-blue-50/30")}
                       >
                         <p className={cn("text-xs font-bold uppercase tracking-wider mb-1", n.type === 'success' ? 'text-emerald-600' : n.type === 'error' ? 'text-red-600' : n.type === 'warning' ? 'text-amber-600' : 'text-blue-600')}>{n.title}</p>

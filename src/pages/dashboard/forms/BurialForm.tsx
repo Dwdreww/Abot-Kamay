@@ -140,6 +140,15 @@ export default function BurialForm() {
       });
 
       if (status === 'Submitted') {
+        await addDoc(collection(db, 'notifications'), {
+          targetRole: 'admin_broadcast',
+          title: 'Bagong Aplikasyon',
+          message: `${user?.name || 'Isang user'} ay nagpasa ng Burial Assistance form.`,
+          type: 'info',
+          isReadBy: [],
+          createdAt: serverTimestamp(),
+          link: 'tracking'
+        });
         setSubmitted(true);
       } else {
         setSuccessMsg('Nai-save ang draft nang matagumpay.');
