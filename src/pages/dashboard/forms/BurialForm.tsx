@@ -22,6 +22,13 @@ export default function BurialForm() {
   const [refNo, setRefNo] = useState(generateRef());
   const [docId, setDocId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const copyRefNo = () => {
+    navigator.clipboard.writeText(refNo);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const initialFormState = {
@@ -358,9 +365,16 @@ export default function BurialForm() {
             Matagumpay na natanggap ang iyong aplikasyon para sa burial assistance. 
             Pakitago ang iyong reference number para sa pag-track.
           </p>
-          <div className="bg-neutral-50 p-6 rounded-2xl border border-neutral-100 inline-block font-mono text-2xl font-bold text-blue-600 tracking-widest px-10">
+          <button
+            onClick={copyRefNo}
+            title="I-click para kopyahin"
+            className="bg-neutral-50 p-6 rounded-2xl border border-neutral-100 font-mono text-2xl font-bold text-blue-600 tracking-widest px-10 hover:border-blue-300 hover:bg-blue-50 transition-all active:scale-95 cursor-copy flex flex-col items-center gap-2"
+          >
             {refNo}
-          </div>
+            <span className="text-xs font-sans font-bold tracking-widest uppercase" style={{ color: copied ? '#16a34a' : '#93c5fd' }}>
+              {copied ? '✓ Nakopya!' : 'I-click para kopyahin'}
+            </span>
+          </button>
           <div className="pt-8 flex flex-col sm:flex-row gap-4 justify-center">
             <button 
               onClick={handleReset}

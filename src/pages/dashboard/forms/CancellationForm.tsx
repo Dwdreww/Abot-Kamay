@@ -17,6 +17,13 @@ export default function CancellationForm() {
   const [submitted, setSubmitted] = useState(false);
   const [refNo, setRefNo] = useState(generateRef());
   const [showPreview, setShowPreview] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const copyRefNo = () => {
+    navigator.clipboard.writeText(refNo);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
   const previewRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState({
     fullName: '',
@@ -193,9 +200,16 @@ export default function CancellationForm() {
             transition={{ duration: 1.5, repeat: Infinity }}
             className="absolute inset-0 bg-blue-400 rounded-2xl blur-2xl font-mono"
           />
-          <div className="relative bg-white p-8 rounded-3xl border border-blue-100 shadow-2xl font-mono text-3xl font-black text-blue-600 tracking-[0.2em] px-12 z-10">
+          <button
+            onClick={copyRefNo}
+            title="I-click para kopyahin"
+            className="relative bg-white p-8 rounded-3xl border border-blue-100 shadow-2xl font-mono text-3xl font-black text-blue-600 tracking-[0.2em] px-12 z-10 hover:border-blue-400 hover:shadow-blue-200 transition-all active:scale-95 cursor-copy flex flex-col items-center gap-2"
+          >
             {refNo}
-          </div>
+            <span className="text-xs font-sans font-bold tracking-widest uppercase" style={{ color: copied ? '#16a34a' : '#93c5fd' }}>
+              {copied ? '✓ Nakopya!' : 'I-click para kopyahin'}
+            </span>
+          </button>
         </motion.div>
         <div className="pt-8">
           <button 

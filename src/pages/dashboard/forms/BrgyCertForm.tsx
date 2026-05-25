@@ -16,7 +16,14 @@ export default function BrgyCertForm() {
   const [submitted, setSubmitted] = useState(false);
   const [refNo, setRefNo] = useState(generateRef());
   const [showPreview, setShowPreview] = useState(false);
+  const [copied, setCopied] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
+
+  const copyRefNo = () => {
+    navigator.clipboard.writeText(refNo);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     deceasedName: '',
@@ -150,9 +157,16 @@ export default function BrgyCertForm() {
         <p className="text-neutral-500 text-lg">
           Matagumpay na naipadala ang inyong kahilingan para sa Barangay Certification.
         </p>
-        <div className="bg-neutral-50 p-6 rounded-2xl border border-neutral-100 inline-block font-mono text-2xl font-bold text-blue-600 tracking-widest px-10">
+        <button
+          onClick={copyRefNo}
+          title="I-click para kopyahin"
+          className="bg-neutral-50 p-6 rounded-2xl border border-neutral-100 font-mono text-2xl font-bold text-blue-600 tracking-widest px-10 hover:border-blue-300 hover:bg-blue-50 transition-all active:scale-95 cursor-copy flex flex-col items-center gap-2"
+        >
           {refNo}
-        </div>
+          <span className="text-xs font-sans font-bold tracking-widest uppercase" style={{ color: copied ? '#16a34a' : '#93c5fd' }}>
+            {copied ? '✓ Nakopya!' : 'I-click para kopyahin'}
+          </span>
+        </button>
         <div className="pt-8 flex justify-center">
           <button 
             onClick={() => { setSubmitted(false); setShowPreview(false); setRefNo(generateRef()); }}
