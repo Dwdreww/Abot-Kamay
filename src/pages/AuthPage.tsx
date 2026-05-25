@@ -286,15 +286,12 @@ export default function AuthPage({ onBack }: { onBack: () => void }) {
           {/* Logo row */}
           <div className="flex items-center gap-4">
             <img
-              src="/logoAbotKamay.png"
+              src="/White-logo.png"
               alt="Abot-Kamay Logo"
               className="h-12 w-12 rounded-xl object-contain"
             />
             <div>
-              <p className="text-lg font-black tracking-tight leading-none">Abot-Kamay</p>
-              <p className="text-[9px] font-bold text-blue-300 uppercase tracking-[0.18em] mt-0.5">
-                Empowering Lives. Building Inclusion.
-              </p>
+              <p className="text-2xl font-black tracking-tight leading-none">Abot-Kamay</p>
             </div>
           </div>
 
@@ -306,8 +303,8 @@ export default function AuthPage({ onBack }: { onBack: () => void }) {
               transition={{ duration: 0.5 }}
               className="text-[3.4rem] font-black leading-[1.08] tracking-tight"
             >
-              Accessible Support,<br />
-              <span className="text-blue-300">Within Reach.</span>
+              Mas Madaling Serbisyo,<br />
+              <span className="text-blue-300">Abot-Kamay Na.</span>
             </motion.h1>
 
             <motion.p
@@ -316,7 +313,7 @@ export default function AuthPage({ onBack }: { onBack: () => void }) {
               transition={{ delay: 0.15, duration: 0.5 }}
               className="mt-6 text-base font-medium text-white/75 max-w-[340px] leading-relaxed"
             >
-              Empowering Persons with Disabilities and building an inclusive community together.
+              Nagbibigay-lakas sa mga Persons with Disabilities at sama-samang bumubuo ng isang inklusibong komunidad.
             </motion.p>
           </div>
 

@@ -176,23 +176,23 @@ export default function Dashboard() {
       >
         {/* Logo Section */}
         <div className="p-8 flex items-start gap-3">
-          <img src="/logoAbotKamay.png" alt="Logo" className="w-10 h-10 object-contain rounded-xl -mt-1" />
+          <img src="/White-logo.png" alt="Logo" className="w-10 h-10 object-contain rounded-xl -mt-1" />
           {isSidebarOpen && (
             <div className="flex flex-col">
               <h1 className="text-lg font-black leading-none uppercase tracking-tight">Abot-Kamay</h1>
               <p className="text-[8px] text-white/70 font-bold uppercase tracking-widest mt-1">Barangay PWD Platform</p>
-              {user?.role !== 'member' && (
-                <div className="mt-2">
-                  <span className={cn(
-                    "px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest border inline-block",
-                    (user?.role === 'admin' || user?.role === 'system_admin')
-                      ? "bg-purple-500/20 text-purple-300 border-purple-500/30"
-                      : "bg-blue-500/20 text-blue-300 border-blue-500/30"
-                  )}>
-                    {(user?.role === 'admin' || user?.role === 'system_admin') ? 'System Admin' : 'Barangay Staff'}
-                  </span>
-                </div>
-              )}
+              <div className="mt-2">
+                <span className={cn(
+                  "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border inline-block",
+                  (user?.role === 'admin' || user?.role === 'system_admin')
+                    ? "bg-purple-500/20 text-purple-300 border-purple-500/30"
+                    : user?.role === 'member'
+                    ? "bg-white/20 text-white border-white/30"
+                    : "bg-blue-500/20 text-blue-300 border-blue-500/30"
+                )}>
+                  {(user?.role === 'admin' || user?.role === 'system_admin') ? 'System Admin' : user?.role === 'member' ? 'PWD Member' : 'Barangay Staff'}
+                </span>
+              </div>
             </div>
           )}
         </div>

@@ -70,12 +70,14 @@ export default function Overview({ onNavigate }: Props) {
     }
   };
 
+  const approvalRate = statsData.total > 0 ? Math.round((statsData.approved / statsData.total) * 100) : 0;
+
   const stats = [
     { label: 'Mga Aplikasyon', value: statsData.total.toString(), sub: 'Lahat ng oras', icon: Users, color: 'blue', view: 'tracking', filter: undefined },
     { label: 'Mga Inaprubahan', value: statsData.approved.toString(), sub: 'Lahat ng oras', icon: CheckCircle2, color: 'emerald', view: 'tracking', filter: 'Inaprubahan' },
     { label: 'Para Sa Paglilinaw', value: statsData.forReview.toString(), sub: 'Lahat ng oras', icon: FileSearch, color: 'orange', view: 'tracking', filter: 'Para sa Paglilinaw' },
     { label: 'Ibinalik', value: statsData.returned.toString(), sub: 'Lahat ng oras', icon: RefreshCw, color: 'purple', view: 'tracking', filter: 'Ibinalik' },
-    { label: 'Mga Report', value: '92%', sub: 'Ngayong buwan', icon: BarChart2, color: 'teal', view: 'reports', filter: undefined },
+    { label: 'Approval Rate', value: `${approvalRate}%`, sub: 'Lahat ng oras', icon: BarChart2, color: 'teal', view: 'reports', filter: undefined },
   ];
 
   const cardBg: Record<string, string> = {
