@@ -359,30 +359,120 @@ function DOHPRPWDPreview({ data }: { data: any }) {
 
 function BrgyCertPreview({ data }: { data: any }) {
   const fd = data.formData || {};
+  const filipinoMonths = ['Enero','Pebrero','Marso','Abril','Mayo','Hunyo','Hulyo','Agosto','Setyembre','Oktubre','Nobyembre','Disyembre'];
+  const certDate = (() => {
+    const raw = fd.date || data.submittedAt?.toDate?.()?.toISOString().split('T')[0] || new Date().toISOString().split('T')[0];
+    const d = new Date(raw + (raw.includes('T') ? '' : 'T00:00:00'));
+    return `${filipinoMonths[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+  })();
+  const deceasedName  = fd.deceasedName  || '';
+  const address       = fd.address       || data.address || '';
+  const claimantName  = fd.claimantName  || data.applicantName || '';
+  const relationship  = fd.relationship  || '';
+
+  const blank: React.CSSProperties = {
+    display: 'inline-block', borderBottom: '1.5px solid #111',
+    paddingBottom: '2px', textAlign: 'center', minHeight: '18px',
+  };
+
   return (
-    <>
-      <div className="text-center mb-8">
-        <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Republika ng Pilipinas</p>
-        <p className="text-[10px] font-bold text-neutral-500">Lalawigan ng Cavite</p>
-        <h2 className="text-lg font-black text-neutral-900 uppercase tracking-wide mt-2">Barangay San Antonio de Padua 1</h2>
-        <p className="text-[10px] font-bold text-neutral-500">Lungsod ng Dasmarinas, Cavite</p>
-      </div>
-      <div className="text-center mb-6">
-        <div className="inline-block bg-neutral-900 text-white text-sm font-black uppercase tracking-widest px-8 py-2.5 rounded-xl">
-          Sertipiko ng Burial Assistance
+    <div style={{fontFamily:'Arial, sans-serif', fontSize:'14px', color:'#111', padding:'8px 0'}}>
+
+      {/* Header */}
+      <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'40px'}}>
+        <p style={{fontSize:'11px', color:'#9ca3af', margin:0}}>Ref. No.: {data.referenceNumber}</p>
+        <div style={{textAlign:'center', minWidth:'180px'}}>
+          <p style={{fontSize:'14px', color:'#111', borderBottom:'1.5px solid #111', paddingBottom:'3px', margin:0, textAlign:'center'}}>
+            {certDate}
+          </p>
+          <p style={{fontSize:'12px', color:'#111', marginTop:'4px', textAlign:'center'}}>Petsa</p>
         </div>
-        <p className="text-[10px] font-mono mt-2 text-neutral-400">Ref No: {data.referenceNumber}</p>
       </div>
-      <div className="space-y-1">
-        <Field label="Pangalan ng Claimant" value={data.applicantName} />
-        <Field label="Tirahan"              value={data.address} />
-        <Field label="Pangalan ng Pumanaw"  value={fd.deceasedName} />
-        <Field label="Petsa ng Kamatayan"   value={fd.dateOfDeath} />
-        <Field label="Relasyon"             value={fd.relationship} />
-        <Field label="Halaga"               value={fd.amount} />
+
+      {/* Title */}
+      <div style={{textAlign:'center', marginBottom:'32px'}}>
+        <h2 style={{fontSize:'22px', fontWeight:'bold', color:'#111', letterSpacing:'0.06em', margin:0}}>
+          PAGPAPATUNAY
+        </h2>
       </div>
-      <SignatureBlock submittedAt={data.submittedAt} />
-    </>
+
+      {/* Body */}
+      <div style={{display:'flex', flexDirection:'column', gap:'16px', lineHeight:'1.9'}}>
+
+        <p style={{margin:0}}>Sa kinauukulan,</p>
+
+        {/* Deceased name */}
+        <div style={{display:'flex', alignItems:'baseline', gap:'4px'}}>
+          <span style={{whiteSpace:'nowrap'}}>
+            <span style={{display:'inline-block', width:'2.5rem'}}/>
+            Ito ay bilang pagpapatunay na ang yumaong si
+          </span>
+          <div style={{flex:1, marginLeft:'6px', display:'flex', flexDirection:'column', alignItems:'center'}}>
+            <span style={{...blank, width:'100%'}}>{deceasedName}</span>
+            <span style={{fontSize:'11px', color:'#111', marginTop:'3px', textAlign:'center'}}>(Pangalan ng namatay)</span>
+          </div>
+        </div>
+
+        {/* Address */}
+        <div style={{display:'flex', alignItems:'baseline', gap:'4px'}}>
+          <span style={{whiteSpace:'nowrap'}}>ay residente ng</span>
+          <div style={{flex:1, margin:'0 6px', display:'flex', flexDirection:'column', alignItems:'center'}}>
+            <span style={{...blank, width:'100%'}}>{address}</span>
+            <span style={{fontSize:'11px', color:'#111', marginTop:'3px', textAlign:'center'}}>(buong address at barangay)</span>
+          </div>
+          <span style={{whiteSpace:'nowrap'}}>Lungsod ng Dasmariñas, Cavite</span>
+        </div>
+
+        <p style={{margin:0}}>at kasapi sa Persons with Disability ng aming barangay.</p>
+
+        {/* Claimant + relationship */}
+        <div>
+          <p style={{margin:0, textAlign:'justify'}}>
+            <span style={{display:'inline-block', width:'2.5rem'}}/>
+            Pinatutunayan din na ang "Claimant" sa kanyang Burial Assistance mula sa
+          </p>
+          <div style={{display:'flex', alignItems:'baseline', gap:'16px', marginTop:'8px'}}>
+            <span style={{whiteSpace:'nowrap'}}>Pamahalaang Lungsod ay si</span>
+            <div style={{flex:1, display:'flex', flexDirection:'column', alignItems:'center'}}>
+              <span style={{...blank, width:'100%'}}>{claimantName}</span>
+              <span style={{fontSize:'11px', color:'#111', marginTop:'3px', textAlign:'center'}}>(Pangalan ng Claimant)</span>
+            </div>
+            <div style={{flex:1, display:'flex', flexDirection:'column', alignItems:'center'}}>
+              <span style={{...blank, width:'100%'}}>{relationship}</span>
+              <span style={{fontSize:'11px', color:'#111', marginTop:'3px', textAlign:'center'}}>(Kaano-ano ng namatay)</span>
+            </div>
+          </div>
+        </div>
+
+        <p style={{margin:0}}>yumao at siyang may karapatang tumanggap ng nasabing benepisyo.</p>
+
+        <p style={{margin:0, paddingTop:'8px'}}>
+          <span style={{display:'inline-block', width:'2.5rem'}}/>
+          Maraming salamat po.
+        </p>
+      </div>
+
+      {/* Signatures */}
+      <div style={{marginTop:'64px'}}>
+        {/* Brgy. PWD President — right */}
+        <div style={{display:'flex', justifyContent:'flex-end'}}>
+          <div style={{textAlign:'center'}}>
+            <div style={{borderBottom:'1.5px solid #111', width:'240px', marginBottom:'5px'}}/>
+            <p style={{fontSize:'13px', color:'#111', margin:0}}>Pangalan at pirma ng</p>
+            <p style={{fontSize:'13px', color:'#111', margin:0}}>Brgy. PWD President</p>
+          </div>
+        </div>
+        {/* Kapitan — center */}
+        <div style={{display:'flex', justifyContent:'center', marginTop:'48px'}}>
+          <div style={{textAlign:'center'}}>
+            <div style={{borderBottom:'1.5px solid #111', width:'240px', marginBottom:'5px'}}/>
+            <p style={{fontSize:'13px', color:'#111', margin:0}}>Pangalan at pirma</p>
+            <p style={{fontSize:'13px', color:'#111', margin:0}}>ng Kapitan</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
   );
 }
 
