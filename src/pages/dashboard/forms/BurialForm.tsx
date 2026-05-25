@@ -214,7 +214,7 @@ export default function BurialForm() {
   };
 
   const previewContent = (
-    <div id="form-p-preview" data-pdf-capture className="max-w-[700px] mx-auto bg-white p-10 select-none shadow-sm h-full flex flex-col justify-between">
+    <div id="form-p-preview" data-pdf-capture className="w-[700px] mx-auto bg-white p-10 select-none shadow-sm flex flex-col justify-between">
       <div>
         {/* Letterhead */}
         <div className="flex items-center justify-between mb-10">
@@ -586,14 +586,14 @@ export default function BurialForm() {
           </form>
         ) : (
           /* Preview Mode Component */
-          <div className="bg-white p-8 md:p-12 lg:p-16 rounded-3xl border border-neutral-200 shadow-lg transition-all animate-in zoom-in-95 duration-300">
-            {/* The preview layout directly rendered here so user can see it in DOM naturally without capturing hidden element if possible, but actually we will just render the identical element. For simplicity, we just use the previewContent */}
-            <div className="pointer-events-none">
-              {previewContent}
+          <div className="rounded-3xl border border-neutral-200 shadow-lg transition-all animate-in zoom-in-95 duration-300 overflow-hidden">
+            <div className="overflow-x-auto pb-4">
+              <div className="pointer-events-none min-w-[700px]">
+                {previewContent}
+              </div>
             </div>
-            
-            <div className="mt-8 flex justify-center">
-              <button 
+            <div className="py-4 flex justify-center border-t border-neutral-100 bg-white">
+              <button
                 onClick={() => setPreviewMode(false)}
                 className="text-sm font-bold text-blue-600 hover:underline"
               >

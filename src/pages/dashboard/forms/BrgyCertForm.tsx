@@ -279,10 +279,12 @@ export default function BrgyCertForm() {
            </div>
 
            {/* Letter Preview */}
+           <div className="overflow-x-auto pb-4">
            <div ref={previewRef} data-pdf-capture style={{
              fontFamily: 'Arial, sans-serif',
              background: '#fff',
-             maxWidth: '680px',
+             width: '680px',
+             minWidth: '680px',
              margin: '0 auto',
              padding: '60px 72px',
              minHeight: '920px',
@@ -399,6 +401,7 @@ export default function BrgyCertForm() {
              </div>
 
            </div>
+           </div>{/* end overflow-x-auto */}
         </div>
       )}
     </div>

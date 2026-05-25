@@ -325,7 +325,7 @@ export default function ApplicationTracking({ initialFilter }: { initialFilter?:
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
         <div className="space-y-2">
-          <h2 className="text-4xl font-black text-slate-900 tracking-tight uppercase leading-none">
+          <h2 className="text-2xl md:text-4xl font-black text-slate-900 tracking-tight uppercase leading-none">
             {isAdmin ? 'Mga Rekord ng Aplikasyon' : 'Aking mga Aplikasyon'}
           </h2>
           <p className="text-slate-500 font-medium">
@@ -371,7 +371,7 @@ export default function ApplicationTracking({ initialFilter }: { initialFilter?:
       {/* Table Card */}
       <div className="bg-white rounded-[40px] border border-slate-100 shadow-2xl shadow-slate-200/10 overflow-hidden">
         {/* Tabs */}
-        <div className="px-10 py-8 border-b border-slate-50 flex flex-wrap items-center gap-2">
+        <div className="px-4 py-4 md:px-10 md:py-8 border-b border-slate-50 flex flex-wrap items-center gap-2">
           {tabs.map(tab => (
             <button
               key={tab}
@@ -393,12 +393,12 @@ export default function ApplicationTracking({ initialFilter }: { initialFilter?:
           <table className="w-full text-left">
             <thead className="bg-[#fcfdff]">
               <tr>
-                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Aplikante</th>
-                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Ticket / Ref #</th>
-                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Uri ng Aplikasyon</th>
-                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Petsa</th>
-                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Katayuan</th>
-                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Aksyon</th>
+                <th className="px-4 py-3 md:px-10 md:py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Aplikante</th>
+                <th className="hidden md:table-cell px-4 py-3 md:px-10 md:py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Ticket / Ref #</th>
+                <th className="hidden lg:table-cell px-4 py-3 md:px-10 md:py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Uri ng Aplikasyon</th>
+                <th className="hidden lg:table-cell px-4 py-3 md:px-10 md:py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Petsa</th>
+                <th className="px-4 py-3 md:px-10 md:py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Katayuan</th>
+                <th className="px-4 py-3 md:px-10 md:py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Aksyon</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
@@ -413,14 +413,14 @@ export default function ApplicationTracking({ initialFilter }: { initialFilter?:
                 </tr>
               ) : filteredApplications.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-10 py-20 text-center">
+                  <td colSpan={6} className="px-4 py-12 md:px-10 md:py-20 text-center">
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Walang nahanap na aplikasyon</p>
                   </td>
                 </tr>
               ) : (
                 filteredApplications.map(app => (
                   <tr key={app.id} className="group hover:bg-slate-50/50 transition-colors">
-                    <td className="px-10 py-6">
+                    <td className="px-4 py-3 md:px-10 md:py-6">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 bg-slate-100 rounded-full flex items-center justify-center text-[10px] font-black text-slate-500 uppercase shrink-0">
                           {app.applicantName.split(' ').map(n => n[0]).join('').slice(0, 2)}
@@ -431,10 +431,10 @@ export default function ApplicationTracking({ initialFilter }: { initialFilter?:
                         </div>
                       </div>
                     </td>
-                    <td className="px-10 py-6 text-[11px] font-black font-mono text-slate-400 uppercase">{app.refNo}</td>
-                    <td className="px-10 py-6 text-[11px] font-bold text-slate-500 uppercase tracking-tight max-w-[200px]">{app.type}</td>
-                    <td className="px-10 py-6 text-[10px] font-bold text-slate-400 uppercase tracking-wider">{app.date}</td>
-                    <td className="px-10 py-6 text-center">
+                    <td className="hidden md:table-cell px-4 py-3 md:px-10 md:py-6 text-[11px] font-black font-mono text-slate-400 uppercase">{app.refNo}</td>
+                    <td className="hidden lg:table-cell px-4 py-3 md:px-10 md:py-6 text-[11px] font-bold text-slate-500 uppercase tracking-tight max-w-[200px]">{app.type}</td>
+                    <td className="hidden lg:table-cell px-4 py-3 md:px-10 md:py-6 text-[10px] font-bold text-slate-400 uppercase tracking-wider">{app.date}</td>
+                    <td className="px-4 py-3 md:px-10 md:py-6 text-center">
                       <span className={cn('px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest', STATUS_COLORS[app.status] || 'bg-slate-100 text-slate-500')}>
                         {STATUS_LABELS[app.status] || app.status}
                       </span>
@@ -502,7 +502,7 @@ export default function ApplicationTracking({ initialFilter }: { initialFilter?:
           </table>
         </div>
 
-        <div className="px-10 py-5 border-t border-slate-50 bg-[#fcfdff] flex items-center justify-between">
+        <div className="px-4 py-3 md:px-10 md:py-5 border-t border-slate-50 bg-[#fcfdff] flex items-center justify-between">
           <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">
             {filteredApplications.length} na rekord
           </p>

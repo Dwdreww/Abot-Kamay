@@ -110,7 +110,7 @@ export default function PWDProfiles() {
       {/* Header & Main Actions */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div className="space-y-3">
-          <h2 className="text-4xl font-black text-slate-900 tracking-tight uppercase leading-none">PWD Member Directory</h2>
+          <h2 className="text-2xl md:text-4xl font-black text-slate-900 tracking-tight uppercase leading-none">PWD Member Directory</h2>
           <p className="text-slate-500 font-medium tracking-tight">Access, manage and verify records of Persons with Disabilities in your barangay.</p>
         </div>
         <div className="flex items-center gap-4">
@@ -121,9 +121,9 @@ export default function PWDProfiles() {
              <Download className="w-5 h-5 text-blue-600" />
              Export Directory
            </button>
-           <button 
+           <button
              onClick={() => { setSelectedProfile(null); setIsFormModalOpen(true); }}
-             className="flex items-center gap-3 px-10 py-5 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-2xl shadow-blue-200 hover:bg-blue-500 transition-all active:scale-95"
+             className="flex items-center gap-3 px-5 py-3 md:px-10 md:py-5 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-2xl shadow-blue-200 hover:bg-blue-500 transition-all active:scale-95"
            >
              <Plus className="w-5 h-5" />
              Add PWD Record
@@ -179,18 +179,18 @@ export default function PWDProfiles() {
              <table className="w-full text-left font-sans">
                 <thead className="bg-[#fcfdff]">
                    <tr>
-                      <th className="px-12 py-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">PWD Member</th>
-                      <th className="px-12 py-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">PWD ID Number</th>
-                      <th className="px-12 py-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">Disability Type</th>
-                      <th className="px-12 py-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">Phone / Mobile</th>
-                      <th className="px-12 py-8 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
-                      <th className="px-12 py-8"></th>
+                      <th className="px-4 py-3 md:px-12 md:py-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">PWD Member</th>
+                      <th className="hidden md:table-cell px-4 py-3 md:px-12 md:py-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">PWD ID Number</th>
+                      <th className="hidden lg:table-cell px-4 py-3 md:px-12 md:py-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">Disability Type</th>
+                      <th className="hidden lg:table-cell px-4 py-3 md:px-12 md:py-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">Phone / Mobile</th>
+                      <th className="px-4 py-3 md:px-12 md:py-8 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
+                      <th className="px-4 py-3 md:px-12 md:py-8"></th>
                    </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
                    {paginatedMembers.map((member) => (
                      <tr key={member.id} className="group hover:bg-slate-50/50 transition-colors">
-                        <td className="px-12 py-8 flex items-center gap-5">
+                        <td className="px-4 py-3 md:px-12 md:py-8 flex items-center gap-3 md:gap-5">
                            <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center font-black text-sm uppercase tracking-tighter shrink-0 border border-blue-100 shadow-sm transition-transform group-hover:scale-110">
                               {member.firstName.charAt(0)}{member.lastName.charAt(0)}
                            </div>
@@ -203,10 +203,10 @@ export default function PWDProfiles() {
                               </p>
                            </div>
                         </td>
-                        <td className="px-12 py-8 text-[11px] font-black font-mono text-slate-400 tracking-tighter uppercase">{member.pwdNumber || 'N/A'}</td>
-                        <td className="px-12 py-8 text-[11px] font-bold text-slate-500 uppercase tracking-tight">{member.disabilityType || 'Not specified'}</td>
-                        <td className="px-12 py-8 text-[11px] font-bold text-slate-500 uppercase tracking-widest tracking-tighter">{member.contactNumber || 'N/A'}</td>
-                        <td className="px-12 py-8 text-center">
+                        <td className="hidden md:table-cell px-4 py-3 md:px-12 md:py-8 text-[11px] font-black font-mono text-slate-400 tracking-tighter uppercase">{member.pwdNumber || 'N/A'}</td>
+                        <td className="hidden lg:table-cell px-4 py-3 md:px-12 md:py-8 text-[11px] font-bold text-slate-500 uppercase tracking-tight">{member.disabilityType || 'Not specified'}</td>
+                        <td className="hidden lg:table-cell px-4 py-3 md:px-12 md:py-8 text-[11px] font-bold text-slate-500 uppercase tracking-widest tracking-tighter">{member.contactNumber || 'N/A'}</td>
+                        <td className="px-4 py-3 md:px-12 md:py-8 text-center">
                            <span className={cn(
                              "px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest shadow-sm whitespace-nowrap",
                              member.status === 'Verified' ? "bg-emerald-50 text-emerald-600" :
@@ -217,7 +217,7 @@ export default function PWDProfiles() {
                               {member.status}
                            </span>
                         </td>
-                        <td className="px-12 py-8 text-right">
+                        <td className="px-4 py-3 md:px-12 md:py-8 text-right">
                            <div className="flex items-center justify-end gap-2 transition-opacity">
                               <button 
                                 onClick={() => { setSelectedProfile(member); setIsViewModalOpen(true); }}
@@ -254,7 +254,7 @@ export default function PWDProfiles() {
 
           {/* Footer Controls */}
           {!loading && filteredMembers.length > 0 && (
-          <div className="p-10 border-t border-slate-50 bg-[#fcfdff] flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="p-4 md:p-10 border-t border-slate-50 bg-[#fcfdff] flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8">
              <div className="flex items-center gap-6">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">
                   Showing {Math.min((currentPage - 1) * rowsPerPage + 1, filteredMembers.length)} to {Math.min(currentPage * rowsPerPage, filteredMembers.length)} of {filteredMembers.length} records

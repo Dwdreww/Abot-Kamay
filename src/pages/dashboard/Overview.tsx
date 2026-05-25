@@ -124,7 +124,7 @@ export default function Overview({ onNavigate }: Props) {
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
       {/* Welcome Header */}
       <div className="space-y-1">
-        <h2 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
+        <h2 className="text-xl md:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
           Welcome back, {user?.name || 'Member'} 👋
         </h2>
         <p className="text-slate-500 font-medium tracking-tight">Here's what's happening in PWD services in your barangay.</p>
@@ -139,11 +139,11 @@ export default function Overview({ onNavigate }: Props) {
               key={i}
               onClick={() => onNavigate(stat.view, stat.filter)}
               className={cn(
-                "p-8 rounded-[40px] border shadow-xl text-left group hover:-translate-y-1 transition-all duration-300 w-full",
+                "p-5 md:p-8 rounded-[40px] border shadow-xl text-left group hover:-translate-y-1 transition-all duration-300 w-full",
                 cardBg[stat.color]
               )}
             >
-               <div className="flex items-center justify-between mb-8">
+               <div className="flex items-center justify-between mb-5 md:mb-8">
                   <div className={cn(
                     "w-12 h-12 rounded-2xl flex items-center justify-center transition-all group-hover:scale-110 shadow-lg",
                     iconBg[stat.color]
@@ -152,7 +152,7 @@ export default function Overview({ onNavigate }: Props) {
                   </div>
                </div>
                <div className="space-y-1">
-                 <h4 className={cn("text-3xl font-black tracking-tight leading-none uppercase", valueColor[stat.color])}>{stat.value}</h4>
+                 <h4 className={cn("text-2xl md:text-3xl font-black tracking-tight leading-none uppercase", valueColor[stat.color])}>{stat.value}</h4>
                  <p className={cn("text-[10px] font-black uppercase tracking-widest", labelColor[stat.color])}>{stat.label}</p>
                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none">{stat.sub}</p>
                </div>
@@ -167,8 +167,8 @@ export default function Overview({ onNavigate }: Props) {
 
       {/* Recent Applications — full width */}
       <div className="bg-white rounded-[50px] border border-slate-100 shadow-2xl shadow-slate-200/20 flex flex-col overflow-hidden">
-        <div className="p-10 border-b border-slate-50 flex items-center justify-between">
-          <h3 className="text-xl font-black text-slate-900 tracking-tight uppercase">Recent Applications</h3>
+        <div className="p-5 md:p-10 border-b border-slate-50 flex items-center justify-between">
+          <h3 className="text-base md:text-xl font-black text-slate-900 tracking-tight uppercase">Recent Applications</h3>
           <button
             onClick={() => onNavigate('tracking')}
             className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline"
@@ -181,14 +181,14 @@ export default function Overview({ onNavigate }: Props) {
             <tbody className="divide-y divide-slate-50">
               {loading ? (
                 <tr>
-                  <td colSpan={3} className="p-10 text-center">
+                  <td colSpan={3} className="p-6 md:p-10 text-center">
                     <Loader2 className="w-6 h-6 animate-spin text-blue-600 mx-auto" />
                   </td>
                 </tr>
               ) : recentApps.length > 0 ? (
                 recentApps.map((app, i) => (
                   <tr key={i} className="group hover:bg-slate-50/50 transition-colors">
-                    <td className="p-10 flex gap-5">
+                    <td className="p-4 md:p-10 flex gap-3 md:gap-5">
                       <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shrink-0">
                         <ClipboardList className="w-6 h-6" />
                       </div>
@@ -197,10 +197,10 @@ export default function Overview({ onNavigate }: Props) {
                         <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{app.service}</p>
                       </div>
                     </td>
-                    <td className="p-10 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">
+                    <td className="hidden md:table-cell p-4 md:p-10 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">
                       {app.date}
                     </td>
-                    <td className="p-10 text-right">
+                    <td className="p-4 md:p-10 text-right">
                       <span className={cn(
                         "px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest shadow-sm",
                         app.color === 'orange' ? "bg-orange-50 text-orange-600" :
@@ -215,7 +215,7 @@ export default function Overview({ onNavigate }: Props) {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={3} className="p-10 text-center text-slate-400 text-[10px] font-black uppercase tracking-widest">
+                  <td colSpan={3} className="p-6 md:p-10 text-center text-slate-400 text-[10px] font-black uppercase tracking-widest">
                     Walang aplikasyon
                   </td>
                 </tr>
@@ -223,7 +223,7 @@ export default function Overview({ onNavigate }: Props) {
             </tbody>
           </table>
         </div>
-        <div className="p-10 border-t border-slate-50 bg-[#fcfdff] text-center">
+        <div className="p-5 md:p-10 border-t border-slate-50 bg-[#fcfdff] text-center">
           <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Showing {recentApps.length} of {statsData.total} applications</p>
         </div>
       </div>

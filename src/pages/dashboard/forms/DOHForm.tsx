@@ -218,7 +218,7 @@ export default function DOHForm() {
       />
 
       {/* Header */}
-      <div className="bg-blue-600 p-8 text-white">
+      <div className="bg-blue-600 p-5 md:p-8 text-white">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h2 className="text-2xl font-bold">DOH PRPWD Registry Form</h2>
@@ -232,27 +232,28 @@ export default function DOHForm() {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-neutral-100 px-4 pt-4 overflow-x-auto scrollbar-hide">
+      <div className="flex border-b border-neutral-100 px-2 md:px-4 pt-4 overflow-x-auto scrollbar-hide">
         {[
-          { id: 'personal', label: '1. Personal Information' },
-          { id: 'disability', label: '2. Disability Details' },
-          { id: 'employment', label: '3. Employment & Education' },
-          { id: 'additional', label: '4. Additional Info' }
+          { id: 'personal', label: '1. Personal Information', short: '1. Personal' },
+          { id: 'disability', label: '2. Disability Details', short: '2. Disability' },
+          { id: 'employment', label: '3. Employment & Education', short: '3. Employment' },
+          { id: 'additional', label: '4. Additional Info', short: '4. Additional' }
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
             className={cn(
-              "px-6 py-4 text-sm font-bold transition-all border-b-4 whitespace-nowrap",
+              "px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm font-bold transition-all border-b-4 whitespace-nowrap flex-1 md:flex-none text-center",
               activeTab === tab.id ? "border-blue-600 text-blue-600" : "border-transparent text-neutral-400 hover:text-neutral-600"
             )}
           >
-            {tab.label}
+            <span className="hidden md:inline">{tab.label}</span>
+            <span className="md:hidden">{tab.short}</span>
           </button>
         ))}
       </div>
 
-      <div className="p-8 flex-grow overflow-y-auto">
+      <div className="p-4 md:p-8 flex-grow overflow-y-auto">
         <form className="space-y-8">
           {activeTab === 'personal' && (
             <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">

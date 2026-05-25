@@ -337,19 +337,19 @@ export default function AuthPage({ onBack }: { onBack: () => void }) {
         </div>
       </div>
 
-      <div className="flex-grow flex items-center justify-center p-8 md:p-20 bg-slate-50/50">
+      <div className="flex-grow flex items-center justify-center p-4 md:p-20 bg-slate-50/50">
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="w-full max-w-[540px] bg-white rounded-[40px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] p-12 border border-slate-100"
+          className="w-full max-w-[540px] bg-white rounded-[40px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] p-6 md:p-12 border border-slate-100"
         >
-          <div className="text-center mb-12">
+          <div className="text-center mb-6 md:mb-12">
             <img
               src="/sadplogo.png"
               alt="Logo"
               className="h-16 w-auto mx-auto mb-6 rounded-2xl"
             />
-            <h2 className="text-4xl font-black text-slate-900 mb-3 tracking-tight">
+            <h2 className="text-2xl md:text-4xl font-black text-slate-900 mb-3 tracking-tight">
               {mode === 'login' ? 'Portal Login' : 'Gumawa ng Account'}
             </h2>
             <p className="text-sm font-medium text-slate-500">
@@ -359,7 +359,7 @@ export default function AuthPage({ onBack }: { onBack: () => void }) {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-10">
+          <form onSubmit={handleSubmit} className="space-y-6 md:space-y-10">
             <div className="space-y-4">
               <label className="text-xs font-black text-slate-400 uppercase tracking-widest pl-1">
                 Piliin ang inyong portal access
@@ -785,7 +785,7 @@ export default function AuthPage({ onBack }: { onBack: () => void }) {
             </div>
           </form>
 
-          <div className="mt-12 p-6 bg-blue-50 rounded-[2rem] flex items-start gap-4 border border-blue-100">
+          <div className="mt-6 md:mt-12 p-4 md:p-6 bg-blue-50 rounded-[2rem] flex items-start gap-4 border border-blue-100">
             <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center shrink-0">
               <Info className="w-4 h-4 text-white" />
             </div>

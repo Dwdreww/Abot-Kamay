@@ -41,6 +41,18 @@ export default function Dashboard() {
   const [broadcastNotifs, setBroadcastNotifs] = useState<SystemNotification[]>([]);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) setIsSidebarOpen(false);
+    };
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   useEffect(() => {
     if (!user?.uid) return;
@@ -163,12 +175,21 @@ export default function Dashboard() {
 
   return (
     <div className="flex h-screen w-full bg-[#f8faff] font-sans text-slate-800 overflow-hidden">
+      {/* Mobile sidebar backdrop */}
+      {isMobile && isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-10"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar Navigation */}
       <motion.nav
         initial={false}
-        animate={{ width: isSidebarOpen ? 280 : 80 }}
+        animate={{ width: isMobile ? (isSidebarOpen ? 280 : 0) : (isSidebarOpen ? 280 : 80) }}
         className={cn(
-          "flex flex-col shrink-0 z-20 relative text-white transition-colors duration-500",
+          "flex flex-col z-20 text-white transition-colors duration-500 overflow-hidden",
+          isMobile ? "fixed inset-y-0 left-0 shadow-2xl" : "relative shrink-0",
           user?.role === 'member'
             ? "bg-gradient-to-b from-[#2563FF] to-[#1d4ed8]"
             : "bg-[#0b1a38]"
@@ -315,7 +336,7 @@ export default function Dashboard() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden relative">
         {/* Header */}
-        <header className="h-20 bg-white border-b border-slate-100 flex items-center justify-between px-10 shrink-0 z-10">
+        <header className="h-16 md:h-20 bg-white border-b border-slate-100 flex items-center justify-between px-4 md:px-10 shrink-0 z-10">
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             className="p-2 hover:bg-slate-50 rounded-xl transition-colors"
@@ -323,7 +344,7 @@ export default function Dashboard() {
             <Menu className="w-6 h-6 text-slate-400" />
           </button>
 
-          <div className="flex items-center gap-8 relative">
+          <div className="flex items-center gap-3 md:gap-8 relative">
             <button 
               onClick={() => { setIsNotifOpen(!isNotifOpen); setIsProfileOpen(false); }}
               className="relative p-2 text-slate-400 hover:text-blue-600 transition-colors"
@@ -335,7 +356,7 @@ export default function Dashboard() {
             </button>
 
             {isNotifOpen && (
-              <div className="absolute top-12 right-40 w-80 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 overflow-hidden">
+              <div className="absolute top-12 right-0 md:right-40 w-[min(320px,90vw)] md:w-80 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 overflow-hidden">
                 <div className="p-4 border-b border-slate-50 bg-slate-50/50">
                   <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Mga Notipikasyon</h3>
                 </div>
@@ -366,8 +387,8 @@ export default function Dashboard() {
               </div>
             )}
 
-            <div className="flex items-center gap-4 pl-8 border-l border-slate-100">
-              <div className="flex flex-col items-end">
+            <div className="flex items-center gap-3 md:gap-4 pl-3 md:pl-8 border-l border-slate-100">
+              <div className="hidden sm:flex flex-col items-end">
                 <span className="text-sm font-black text-slate-900">{user?.name}</span>
                 <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-1.5">
                   <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
@@ -414,7 +435,7 @@ export default function Dashboard() {
         </header>
 
         {/* Main Feed */}
-        <main className="flex-1 overflow-y-auto scrollbar-hide p-10 bg-[#f8faff]">
+        <main className="flex-1 overflow-y-auto scrollbar-hide p-4 md:p-10 bg-[#f8faff]">
           <div className="max-w-7xl mx-auto h-full">
             <AnimatePresence mode="wait">
               <motion.div
