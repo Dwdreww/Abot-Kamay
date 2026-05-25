@@ -219,16 +219,8 @@ export default function DOHForm() {
 
       {/* Header */}
       <div className="bg-blue-600 p-5 md:p-8 text-white">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h2 className="text-2xl font-bold">DOH PRPWD Registry Form</h2>
-            <p className="text-blue-100 text-sm mt-1 opacity-80 uppercase tracking-widest font-black">Philippine Registry for Persons with Disability</p>
-          </div>
-          <div className="bg-white/20 px-4 py-2 rounded-xl backdrop-blur-md">
-            <p className="text-[10px] uppercase font-bold tracking-widest opacity-60">Ticket No.</p>
-            <p className="font-mono text-lg font-bold">{refNo}</p>
-          </div>
-        </div>
+        <h2 className="text-2xl font-bold">DOH PRPWD Registry Form</h2>
+        <p className="text-blue-100 text-sm mt-1 opacity-80 uppercase tracking-widest font-black">Philippine Registry for Persons with Disability</p>
       </div>
 
       {/* Tabs */}
