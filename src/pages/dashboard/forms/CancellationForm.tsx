@@ -338,33 +338,36 @@ export default function CancellationForm() {
         </div>
       ) : (
         <div className="space-y-8 animate-in zoom-in-95 duration-500">
-           <div className="flex items-center justify-between bg-white p-6 px-10 rounded-[30px] border border-slate-100 shadow-2xl shadow-slate-200/20">
-              <button 
+           <div className="flex flex-wrap items-center justify-between gap-2 bg-white p-3 md:p-6 md:px-10 rounded-[30px] border border-slate-100 shadow-2xl shadow-slate-200/20">
+              <button
                 onClick={() => setShowPreview(false)}
-                className="flex items-center gap-3 text-slate-500 font-black text-[10px] uppercase tracking-widest hover:text-blue-600 transition-colors group"
+                className="flex items-center gap-2 md:gap-3 text-slate-500 font-black text-[10px] uppercase tracking-widest hover:text-blue-600 transition-colors group"
               >
-                <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                I-edit ang Detalye
+                <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform shrink-0" />
+                <span className="hidden sm:inline">I-edit ang Detalye</span>
+                <span className="sm:hidden">I-edit</span>
               </button>
-              <div className="flex items-center gap-4">
-                 <button className="p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-white hover:shadow-lg transition-all text-slate-400 hover:text-blue-600">
-                    <Printer className="w-5 h-5" />
+              <div className="flex items-center gap-2 md:gap-4">
+                 <button className="p-3 md:p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-white hover:shadow-lg transition-all text-slate-400 hover:text-blue-600">
+                    <Printer className="w-4 h-4 md:w-5 md:h-5" />
                  </button>
-                 <button 
+                 <button
                    onClick={handleSubmit}
                    disabled={loading}
-                   className="px-8 py-4 bg-blue-600 text-white font-black rounded-2xl hover:bg-blue-500 transition-all shadow-xl shadow-blue-200 flex items-center gap-3 text-[10px] uppercase tracking-widest disabled:opacity-50"
+                   className="px-3 py-2 md:px-8 md:py-4 bg-blue-600 text-white font-black rounded-2xl hover:bg-blue-500 transition-all shadow-xl shadow-blue-200 flex items-center gap-2 md:gap-3 text-[10px] uppercase tracking-widest disabled:opacity-50"
                  >
-                   {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
-                   I-submit ang Kahilingan
+                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4 shrink-0" />}
+                   <span className="hidden sm:inline">I-submit ang Kahilingan</span>
+                   <span className="sm:hidden">I-submit</span>
                  </button>
                  <button
                    onClick={handleDownload}
                    disabled={downloading}
-                   className="px-8 py-4 bg-emerald-600 text-white font-black rounded-2xl hover:bg-emerald-500 transition-all shadow-xl shadow-emerald-200 flex items-center gap-3 text-[10px] uppercase tracking-widest disabled:opacity-50"
+                   className="px-3 py-2 md:px-8 md:py-4 bg-emerald-600 text-white font-black rounded-2xl hover:bg-emerald-500 transition-all shadow-xl shadow-emerald-200 flex items-center gap-2 md:gap-3 text-[10px] uppercase tracking-widest disabled:opacity-50"
                  >
-                    {downloading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
-                    {downloading ? 'Ginagawa...' : 'I-export ang PDF'}
+                    {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4 shrink-0" />}
+                    <span className="hidden sm:inline">{downloading ? 'Ginagawa...' : 'I-export ang PDF'}</span>
+                    <span className="sm:hidden">PDF</span>
                  </button>
               </div>
            </div>

@@ -250,30 +250,33 @@ export default function BrgyCertForm() {
         </div>
       ) : (
         <div className="space-y-8 animate-in zoom-in-95 duration-300">
-           <div className="flex items-center justify-between bg-white p-4 px-8 rounded-2xl border border-neutral-200 shadow-sm">
-              <button 
+           <div className="flex flex-wrap items-center justify-between gap-2 bg-white p-3 md:p-4 md:px-8 rounded-2xl border border-neutral-200 shadow-sm">
+              <button
                 onClick={() => setShowPreview(false)}
-                className="flex items-center gap-2 text-neutral-500 font-bold hover:text-blue-600 transition-colors"
+                className="flex items-center gap-2 text-neutral-500 font-bold hover:text-blue-600 transition-colors text-sm"
               >
-                <ChevronLeft className="w-5 h-5" />
-                I-edit ang Detalye
+                <ChevronLeft className="w-5 h-5 shrink-0" />
+                <span className="hidden sm:inline">I-edit ang Detalye</span>
+                <span className="sm:hidden">I-edit</span>
               </button>
-               <div className="flex items-center gap-3">
-                 <button 
+               <div className="flex items-center gap-2 md:gap-3">
+                 <button
                    disabled={loading}
                    onClick={handleSubmit}
-                   className="px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all shadow-md shadow-blue-600/20 flex items-center gap-2 disabled:opacity-50"
+                   className="px-3 py-2 md:px-6 md:py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all shadow-md shadow-blue-600/20 flex items-center gap-2 disabled:opacity-50 text-xs md:text-sm"
                  >
-                   {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
-                   I-submit ang Aplikasyon
+                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4 shrink-0" />}
+                   <span className="hidden sm:inline">I-submit ang Aplikasyon</span>
+                   <span className="sm:hidden">I-submit</span>
                  </button>
                  <button
                    onClick={handleDownload}
                    disabled={downloading}
-                   className="px-6 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition-all shadow-md shadow-green-600/20 flex items-center gap-2 disabled:opacity-50"
+                   className="px-3 py-2 md:px-6 md:py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition-all shadow-md shadow-green-600/20 flex items-center gap-2 disabled:opacity-50 text-xs md:text-sm"
                  >
-                    {downloading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
-                    {downloading ? 'Ginagawa...' : 'I-export ang PDF'}
+                    {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4 shrink-0" />}
+                    <span className="hidden sm:inline">{downloading ? 'Ginagawa...' : 'I-export ang PDF'}</span>
+                    <span className="sm:hidden">PDF</span>
                  </button>
               </div>
            </div>
